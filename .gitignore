@@ -1,0 +1,5 @@
+/build*
+/Documentation/html
+# User files
+*.user
+firmatator.pro

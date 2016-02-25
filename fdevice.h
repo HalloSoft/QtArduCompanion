@@ -10,45 +10,14 @@
 #include <QObject>
 #include <stdint.h>
 
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 namespace firmatator
 {
     class FDevice : public QObject
     {
         Q_OBJECT
-
-        int name;
-
-
-        // Firmata protocol vars
-
-        std::string firmataName;
-        bool ready;
-        int majorVersion;
-        int minorVersion;
-
-
-        // Inputs / outputs status
-
-        int analogInputData[10];
-        int digitalInputData[10];
-        int digitalOutputData[10];
-
-
-        // Serial connection vars
-
-        bool connected;
-        QString port;
-        int baud_rate;
-        QSerialPort* serialPort;
-        uint8_t* parserBuffer;
-        int parserCommandLenght;
-        int parserReceivedCount;
-        bool receiving;
-
-
 
     public:
         FDevice(QString serialport = QString(), int baud_rate = 57600);
@@ -129,6 +98,35 @@ namespace firmatator
     signals:
 
         void deviceReady();
+
+    private:
+        //int name;
+
+        // Firmata protocol vars
+
+        std::string firmataName;
+        bool ready;
+        int majorVersion;
+        int minorVersion;
+
+
+        // Inputs / outputs status
+
+        int analogInputData[10];
+        int digitalInputData[10];
+        int digitalOutputData[10];
+
+
+        // Serial connection vars
+
+        bool connected;
+        QString port;
+        int baud_rate;
+        QSerialPort* serialPort;
+        uint8_t* parserBuffer;
+        int parserCommandLenght;
+        int parserReceivedCount;
+        bool receiving;
 
     };
 }

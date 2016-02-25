@@ -24,17 +24,17 @@ FDevice::FDevice(QString serialport, int baudrate)
         serialport = list.value(0).portName();
     }
 
-    this->serialPort = new QSerialPort();
-    this->serialPort->setBaudRate(baudrate);
-    this->serialPort->setPort(QSerialPortInfo(serialport));
+    serialPort = new QSerialPort();
+    serialPort->setBaudRate(baudrate);
+    serialPort->setPort(QSerialPortInfo(serialport));
 
-    QObject::connect(this->serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
+    QObject::connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
     QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
 }
 
 bool FDevice::connect()
 {
-    connected = this->serialPort->open(QIODevice::ReadWrite);
+    connected = serialPort->open(QIODevice::ReadWrite);
 
     if (connected)
         reportFirmware();
@@ -44,7 +44,7 @@ bool FDevice::connect()
 
 void FDevice::disconnect()
 {
-    this->serialPort->close();
+    serialPort->close();
     connected = false;
     ready = false;
 }
@@ -333,7 +333,7 @@ void FDevice::processSerial()
 
     //qDebug() << "Read buffer: " << len;
 
-    QByteArray r = this->serialPort->readAll();
+    QByteArray r = serialPort->readAll();
 
     //qDebug() << "Datos leidos: " << r;
 

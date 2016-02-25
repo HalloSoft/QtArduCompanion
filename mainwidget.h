@@ -22,13 +22,13 @@ public:
 
 private slots:
     void sendTestData();
-    void start();
+    void setReady();
 
 private:
     Ui::MainWidget *ui;
 
     firmatator::FDevice *arduino;
-    QTimer *activeTimer;
+    bool connectionEstablished;
 };
 
 #endif // MAINWIDGET_H

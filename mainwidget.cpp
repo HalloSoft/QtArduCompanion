@@ -11,18 +11,20 @@ using namespace firmatator;
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWidget),
-    arduino(0)
+    arduino(0),
+    connectionEstablished(false)
 {
     arduino = new FDevice("Com1");
+    //arduino = new FDevice("/dev/ttyUSB0");
     Q_CHECK_PTR(arduino);
 
-    arduino->initialize();
+    arduino->connect();
 
     ui->setupUi(this);
 
     bool isConnected = false;                                                                 Q_UNUSED(isConnected);
     isConnected = connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(sendTestData())); Q_ASSERT(isConnected);
-    isConnected = connect(arduino, SIGNAL(deviceReady()), this, SLOT(start()));               Q_ASSERT(isConnected);
+    isConnected = connect(arduino, SIGNAL(deviceReady()), this, SLOT(setReady()));               Q_ASSERT(isConnected);
 
 }
 
@@ -34,37 +36,26 @@ MainWidget::~MainWidget()
 void MainWidget::sendTestData()
 {
     //arduino->s
+     qDebug() << "Sending Testdata.";
+     if(arduino->available())
+     {
+        arduino->digitalWrite(13, 1);
+     }
+     else
+         qDebug() << "Arduino not availabe";
 }
 
-void MainWidget::start()
+void MainWidget::setReady()
 {
-    activeTimer = new QTimer(this);
-    activeTimer->setInterval(1*1000);
-    activeTimer->setSingleShot(false);
-    connect(activeTimer, SIGNAL(timeout()), this, SLOT(step()));
 
     qDebug() << "Initializing ports...";
 
+    // set Modes
     arduino->pinMode(13, FDevice::PINMODE_OUTPUT);
-    //arduino->pinMode(3, FDevice::PINMODE_OUTPUT);
-    arduino->pinMode(3, FDevice::PINMODE_PWM);
-    arduino->pinMode(2, FDevice::PINMODE_SERVO);
 
-    arduino->pinMode(8, FDevice::PINMODE_INPUT);
-    arduino->pinMode(9, FDevice::PINMODE_INPUT);
-    arduino->pinMode(14, FDevice::PINMODE_ANALOG);
+    connectionEstablished = true;
 
-    arduino->pinMode(18, FDevice::PINMODE_I2C);
-    arduino->pinMode(19, FDevice::PINMODE_I2C);
-
-    int readcmd[] = {0x00};
-    //int readbyte[] = {0x02};
-    arduino->I2CConfig(0, 100);
-    arduino->I2CRequest(0x70, readcmd, FDevice::I2C_MODE_READ_ONCE);
-    //arduino->I2CRequest(0x70, readcmd, FDevice::I2C_MODE_READ_ONCE);
 
     qDebug() << "Succesfully initialized.";
 
-    qDebug() << "Starting loop...";
-    activeTimer->start();
 }
