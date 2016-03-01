@@ -11,19 +11,32 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>QtArduCompanion</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="buttonOn">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>230</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>on</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonOff">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>240</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Off</string>
    </property>
   </widget>
  </widget>

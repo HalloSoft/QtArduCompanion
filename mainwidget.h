@@ -21,7 +21,8 @@ public:
 
 
 private slots:
-    void sendTestData();
+    void sendTestDataOn();
+    void sendTestDataOff();
     void setReady();
 
 private:

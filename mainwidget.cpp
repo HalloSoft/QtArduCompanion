@@ -25,9 +25,10 @@ MainWidget::MainWidget(QWidget *parent) :
 
     ui->setupUi(this);
 
-    bool isConnected = false;                                                                 Q_UNUSED(isConnected);
-    isConnected = connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(sendTestData())); Q_ASSERT(isConnected);
-    isConnected = connect(arduino,        SIGNAL(deviceReady()), this, SLOT(setReady()));            Q_ASSERT(isConnected);
+    bool isConnected = false;                                                                   Q_UNUSED(isConnected);
+    isConnected = connect(ui->buttonOn,  SIGNAL(clicked(bool)), this, SLOT(sendTestDataOn()));  Q_ASSERT(isConnected);
+    isConnected = connect(ui->buttonOff, SIGNAL(clicked(bool)), this, SLOT(sendTestDataOff())); Q_ASSERT(isConnected);
+    isConnected = connect(arduino,       SIGNAL(deviceReady()), this, SLOT(setReady()));        Q_ASSERT(isConnected);
 
 }
 
@@ -36,13 +37,23 @@ MainWidget::~MainWidget()
     delete ui;
 }
 
-void MainWidget::sendTestData()
+void MainWidget::sendTestDataOn()
 {
-    //arduino->s
      qDebug() << "Sending Testdata.";
      if(connectionEstablished && arduino->available())
      {
         arduino->digitalWrite(13, 1);
+     }
+     else
+         qDebug() << "Arduino not availabe";
+}
+
+void MainWidget::sendTestDataOff()
+{
+     qDebug() << "Sending Testdata.";
+     if(connectionEstablished && arduino->available())
+     {
+        arduino->digitalWrite(13, 0);
      }
      else
          qDebug() << "Arduino not availabe";
