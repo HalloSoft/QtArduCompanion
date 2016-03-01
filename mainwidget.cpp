@@ -6,6 +6,9 @@
 #include <QDebug>
 #include <QTimer>
 
+#include <QLayout>
+#include <QStatusBar>
+
 using namespace firmatator;
 
 MainWidget::MainWidget(QWidget *parent) :
@@ -14,7 +17,7 @@ MainWidget::MainWidget(QWidget *parent) :
     arduino(0),
     connectionEstablished(false)
 {
-    arduino = new FDevice("Com1");
+    arduino = new FDevice();
     //arduino = new FDevice("/dev/ttyUSB0");
     Q_CHECK_PTR(arduino);
 
@@ -24,7 +27,7 @@ MainWidget::MainWidget(QWidget *parent) :
 
     bool isConnected = false;                                                                 Q_UNUSED(isConnected);
     isConnected = connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(sendTestData())); Q_ASSERT(isConnected);
-    isConnected = connect(arduino, SIGNAL(deviceReady()), this, SLOT(setReady()));               Q_ASSERT(isConnected);
+    isConnected = connect(arduino,        SIGNAL(deviceReady()), this, SLOT(setReady()));            Q_ASSERT(isConnected);
 
 }
 
@@ -37,7 +40,7 @@ void MainWidget::sendTestData()
 {
     //arduino->s
      qDebug() << "Sending Testdata.";
-     if(arduino->available())
+     if(connectionEstablished && arduino->available())
      {
         arduino->digitalWrite(13, 1);
      }

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <QtCore/QDebug>
+#include <QDebug>
 
 #include "util.h"
 
@@ -13,20 +13,20 @@
 using namespace firmatator;
 
 
-FDevice::FDevice(QString serialport, int baudrate)
+FDevice::FDevice(QString serialPortName, int baudrate)
 {
     parserBuffer = (uint8_t*) malloc(4096);
     connected = false;
 
-    if (serialport == "")
+    if (serialPortName.isEmpty())
     {
         QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
-        serialport = list.value(0).portName();
+        serialPortName = list.value(0).portName();
     }
 
-    serialPort = new QSerialPort();
+    serialPort = new QSerialPort(); // Cleanup????
     serialPort->setBaudRate(baudrate);
-    serialPort->setPort(QSerialPortInfo(serialport));
+    serialPort->setPort(QSerialPortInfo(serialPortName));
 
     QObject::connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
     QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));

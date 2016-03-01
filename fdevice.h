@@ -20,8 +20,8 @@ namespace firmatator
         Q_OBJECT
 
     public:
-        FDevice(QString serialport = QString(), int baud_rate = 57600);
-        bool connect();
+        FDevice(QString serialPortName = QString(), int baud_rate = 57600);
+        bool connect(); // TODO: maybe const
         void disconnect();
         bool available();
 
@@ -31,9 +31,9 @@ namespace firmatator
         void requestInputs();
 
         void pinMode(int pin, int mode);
-        int digitalRead(int pin);
+        int  digitalRead(int pin);
         void digitalWrite(int pin, int value);
-        int analogRead(int pin);
+        int  analogRead(int pin);
         void analogWrite(int pin, int value);
         void setServo(int pin, int value);
         void I2CRequest(int addr, int data[], int mode);
@@ -105,9 +105,9 @@ namespace firmatator
         // Firmata protocol vars
 
         std::string firmataName;
-        bool ready;
-        int majorVersion;
-        int minorVersion;
+        bool        ready;
+        int          majorVersion;
+        int          minorVersion;
 
 
         // Inputs / outputs status
@@ -118,15 +118,14 @@ namespace firmatator
 
 
         // Serial connection vars
-
-        bool connected;
-        QString port;
-        int baud_rate;
         QSerialPort* serialPort;
-        uint8_t* parserBuffer;
-        int parserCommandLenght;
-        int parserReceivedCount;
-        bool receiving;
+        bool         connected;
+        QString      port;
+        int          baud_rate;
+        uint8_t*     parserBuffer;
+        int          parserCommandLenght;
+        int          parserReceivedCount;
+        bool         receiving;
 
     };
 }
