@@ -28,8 +28,12 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     serialPort->setBaudRate(baudrate);
     serialPort->setPort(QSerialPortInfo(serialPortName));
 
-    QObject::connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
-    QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
+    bool isConnected = false; Q_UNUSED(isConnected);
+    isConnected = QObject::connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
+    Q_ASSERT(isConnected);
+
+    isConnected = QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
+    Q_ASSERT(isConnected);
 }
 
 bool FDevice::connect()
@@ -335,7 +339,7 @@ void FDevice::processSerial()
 
     QByteArray r = serialPort->readAll();
 
-    //qDebug() << "Datos leidos: " << r;
+    //qDebug() << "Data read:" << r;
 
     for (int i = 0; i< r.length(); i++)
     {
