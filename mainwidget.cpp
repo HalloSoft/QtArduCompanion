@@ -9,7 +9,7 @@
 #include <QLayout>
 #include <QStatusBar>
 
-using namespace firmatator;
+using namespace qfirmata;
 
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent),
@@ -21,7 +21,7 @@ MainWidget::MainWidget(QWidget *parent) :
     //arduino = new FDevice("/dev/ttyUSB0");
     Q_CHECK_PTR(arduino);
 
-    arduino->connect();
+    arduino->connectDevice();
 
     ui->setupUi(this);
 

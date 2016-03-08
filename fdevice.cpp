@@ -10,7 +10,7 @@
 
 #include <fdevice.h>
 
-using namespace firmatator;
+using namespace qfirmata;
 
 
 FDevice::FDevice(QString serialPortName, int baudrate)
@@ -29,14 +29,14 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     serialPort->setPort(QSerialPortInfo(serialPortName));
 
     bool isConnected = false; Q_UNUSED(isConnected);
-    isConnected = QObject::connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
+    isConnected = connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
     Q_ASSERT(isConnected);
 
-    isConnected = QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
+    isConnected = connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
     Q_ASSERT(isConnected);
 }
 
-bool FDevice::connect()
+bool FDevice::connectDevice()
 {
     connected = serialPort->open(QIODevice::ReadWrite);
 
@@ -46,7 +46,7 @@ bool FDevice::connect()
     return connected;
 }
 
-void FDevice::disconnect()
+void FDevice::disconnectDevice()
 {
     serialPort->close();
     connected = false;
@@ -432,7 +432,7 @@ void FDevice::parseBuffer()
                     uint32_t val = (port_val & mask) ? 1 : 0;
                     digitalInputData[pin] = val;
 
-                    //qDebug() << "Set digital pin " << pin << " to value " << val;
+                    qDebug() << "Set digital pin " << pin << " to value " << val;
                     /*
                     if (pin_info[pin].mode == MODE_INPUT)
                     {
@@ -451,7 +451,7 @@ void FDevice::parseBuffer()
     }
     else if (parserBuffer[0] == COMMAND_START_SYSEX && parserBuffer[parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
-        qDebug("Sexy sysex!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        qDebug("Sysex");
 
         if (parserBuffer[1] == COMMAND_REPORT_FIRMWARE)
         {
@@ -519,6 +519,7 @@ void FDevice::parseBuffer()
         }
         else if (parserBuffer[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
         {
+            qDebug() << "COMMAND_ANALOG_MAPPING_RESPONSE";
                 /*
                 int pin=0;
                 for (int i=2; i<parse_count-1; i++)
@@ -531,6 +532,7 @@ void FDevice::parseBuffer()
         }
         else if (parserBuffer[1] == COMMAND_PIN_STATE_RESPONSE && parserReceivedCount >= 6)
         {
+            qDebug() << "COMMAND_PIN_STATE_RESPONSE";
                 /*
                 int pin = parse_buf[2];
                 pin_info[pin].mode = parse_buf[3];
@@ -548,7 +550,7 @@ void FDevice::parseBuffer()
     }
     else
     {
-        qDebug() << "Command not recognized!!!!!!!!!!: " << hex << parserBuffer[0] << "(" << dec << parserReceivedCount << " parameters)";
+        qDebug() << "Command not recognized: " << hex << parserBuffer[0] << "(" << dec << parserReceivedCount << " parameters)";
 
         for (int i = 0; i < parserReceivedCount; i++)
         {

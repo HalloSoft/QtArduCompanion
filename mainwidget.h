@@ -28,7 +28,7 @@ private slots:
 private:
     Ui::MainWidget *ui;
 
-    firmatator::FDevice *arduino;
+    qfirmata::FDevice *arduino;
     bool connectionEstablished;
 };
 
