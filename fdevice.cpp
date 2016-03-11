@@ -40,7 +40,11 @@ bool FDevice::connectDevice()
     connected = serialPort->open(QIODevice::ReadWrite);
 
     if (connected)
+    {
         reportFirmware();
+
+        emit messageFired(_deviceName, QString("Com-Port: %1").arg(serialPort->portName()));
+    }
     else
         emit messageFired(_deviceName, "Device not connected!");
 
@@ -334,9 +338,15 @@ void FDevice::I2CConfig(int pinState, int delay)
 
 void FDevice::processSerial()
 {
-    //int len = this->serialPort->bytesAvailable();
+    if(!serialPort)
+    {
+        emit messageFired(_deviceName, "No serial port anymore");
+        return;
+    }
 
-    //qDebug() << "Read buffer: " << len;
+    int len = this->serialPort->bytesAvailable();
+
+    qDebug() << "Read buffer: " << len;
 
     QByteArray r = serialPort->readAll();
 
@@ -398,10 +408,9 @@ void FDevice::processSerial()
 
 void FDevice::parseBuffer()
 {
-    //qDebug() << "Parsing command...";
 
     uint8_t cmd = (parserBuffer[0] & 0xF0);
-    //qDebug() << "COMMAND TO PROCESS > " << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
+    qDebug() << "COMMAND TO PROCESS;" << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
 
     if (cmd == COMMAND_ANALOG_MESSAGE && parserReceivedCount == 3)
     {
@@ -474,7 +483,7 @@ void FDevice::parseBuffer()
             firmataName = name;
 
             qDebug() << "Firmata version: " << QString::fromStdString(firmataName);
-            emit messageFired("SysEx", QString::fromStdString(firmataName));
+            emit messageFired("SysEx", QString("Firmata-Version: %1").arg(QString::fromStdString(firmataName)));
 
             ready = true;
             emit deviceReady();

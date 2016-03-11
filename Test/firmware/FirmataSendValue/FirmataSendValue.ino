@@ -30,7 +30,10 @@ unsigned long currentMillis;     // store the current value from millis()
 unsigned long previousMillis;    // for comparison with currentMillis
 /* make sure that the FTDI buffer doesn't go over 60 bytes, otherwise you
    get long, random delays.  So only read analogs every 20ms or so */
-int samplingInterval = 19;      // how often to run the main loop (in ms)
+int samplingInterval = 2000;      // how often to run the main loop (in ms)
+
+// Debug
+bool ledOn = false;
 
 void sendPort(byte portNumber, byte portValue)
 {
@@ -60,6 +63,9 @@ void setup()
   }
 
   Firmata.begin(57600);
+
+  // Debug
+  pinMode(13, OUTPUT);
 }
 
 void loop()
@@ -72,17 +78,22 @@ void loop()
   /* make sure that the FTDI buffer doesn't go over 60 bytes, otherwise you
      get long, random delays.  So only read analogs every 20ms or so */
   currentMillis = millis();
-  if (currentMillis - previousMillis > samplingInterval) {
-    previousMillis += samplingInterval;
-    while (Firmata.available()) {
-      Firmata.processInput();
+  if (currentMillis - previousMillis > samplingInterval)
+  {
+    if(ledOn)
+    {
+      digitalWrite(13, HIGH);
+      ledOn = false;  
     }
-    for (pin = 0; pin < TOTAL_ANALOG_PINS; pin++) {
-      analogValue = analogRead(pin);
-      if (analogValue != previousAnalogValues[pin]) {
-        Firmata.sendAnalog(pin, analogValue);
-        previousAnalogValues[pin] = analogValue;
-      }
+    else
+    {
+      digitalWrite(13, LOW);
+      ledOn = true;
+    }
+    previousMillis += samplingInterval;
+    while (Firmata.available()) 
+    {
+      Firmata.processInput();
     }
   }
 }

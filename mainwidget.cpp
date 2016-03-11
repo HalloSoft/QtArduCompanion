@@ -19,8 +19,8 @@ MainWidget::MainWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //arduino = new FDevice();
-    arduino = new FDevice("/dev/ttyUSB0");
+    arduino = new FDevice();
+    //arduino = new FDevice("/dev/ttyACM0");
     Q_CHECK_PTR(arduino);
 
     bool isConnected = false; Q_UNUSED(isConnected);
