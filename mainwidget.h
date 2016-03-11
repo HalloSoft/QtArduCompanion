@@ -24,6 +24,7 @@ private slots:
     void sendTestDataOn();
     void sendTestDataOff();
     void setReady();
+    void appendConsoleLine(const QString& category, const QString& text);
 
 private:
     Ui::MainWidget *ui;

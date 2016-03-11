@@ -17,19 +17,24 @@ MainWidget::MainWidget(QWidget *parent) :
     arduino(0),
     connectionEstablished(false)
 {
-    arduino = new FDevice();
-    //arduino = new FDevice("/dev/ttyUSB0");
-    Q_CHECK_PTR(arduino);
-
-    arduino->connectDevice();
-
     ui->setupUi(this);
 
-    bool isConnected = false;                                                                   Q_UNUSED(isConnected);
+    //arduino = new FDevice();
+    arduino = new FDevice("/dev/ttyUSB0");
+    Q_CHECK_PTR(arduino);
+
+    bool isConnected = false; Q_UNUSED(isConnected);
     isConnected = connect(ui->buttonOn,  SIGNAL(clicked(bool)), this, SLOT(sendTestDataOn()));  Q_ASSERT(isConnected);
     isConnected = connect(ui->buttonOff, SIGNAL(clicked(bool)), this, SLOT(sendTestDataOff())); Q_ASSERT(isConnected);
     isConnected = connect(arduino,       SIGNAL(deviceReady()), this, SLOT(setReady()));        Q_ASSERT(isConnected);
+    isConnected = connect(arduino, SIGNAL(messageFired(QString,QString)), this, SLOT(appendConsoleLine(QString,QString))); Q_ASSERT(isConnected);
 
+    arduino->setDeviceName("ArduinoUno");
+    arduino->connectDevice();
+
+    QPalette palette = ui->console->palette();
+    palette.setColor(QPalette::Base, Qt::black);
+    ui->console->setPalette(palette);
 }
 
 MainWidget::~MainWidget()
@@ -37,26 +42,33 @@ MainWidget::~MainWidget()
     delete ui;
 }
 
+void MainWidget::appendConsoleLine(const QString &category,const QString &text)
+{
+    QPalette palette = ui->console->palette();
+    palette.setColor(QPalette::Text, QColor(255, 127, 127));
+    ui->console->setPalette(palette);
+
+    QString line = "<B>" + category + ":&nbsp;&nbsp;" +text + "</B>" + '\n';
+
+    ui->console->appendHtml(line);
+}
+
 void MainWidget::sendTestDataOn()
 {
-     qDebug() << "Sending Testdata.";
+     appendConsoleLine("MainWidget", "Sending Testdata (On).");
      if(connectionEstablished && arduino->available())
-     {
         arduino->digitalWrite(13, 1);
-     }
      else
-         qDebug() << "Arduino not availabe";
+         appendConsoleLine("MainWidget", "Arduino not availabe");
 }
 
 void MainWidget::sendTestDataOff()
 {
-     qDebug() << "Sending Testdata.";
+     appendConsoleLine("MainWidget", "Sending Testdata (Off).");
      if(connectionEstablished && arduino->available())
-     {
         arduino->digitalWrite(13, 0);
-     }
      else
-         qDebug() << "Arduino not availabe";
+         appendConsoleLine("MainWidget", "Arduino not availabe");
 }
 
 void MainWidget::setReady()
@@ -69,7 +81,6 @@ void MainWidget::setReady()
 
     connectionEstablished = true;
 
-
-    qDebug() << "Succesfully initialized.";
+    appendConsoleLine("MainWidget", "Succesfully initialized.");
 
 }

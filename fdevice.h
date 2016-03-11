@@ -4,7 +4,7 @@
 /*
  * Originaliy from: https://github.com/dh1tw/firmatator
  */
-#include "firmatator_global.h"
+#include "qfirmata_global.h"
 
 #include <string>
 #include <QObject>
@@ -38,6 +38,9 @@ public:
     void setServo(int pin, int value);
     void I2CRequest(int addr, int data[], int mode);
     void I2CConfig(int pinState, int delay);
+
+    QString deviceName() const {return _deviceName;}
+    void setDeviceName(const QString deviceName) {_deviceName = deviceName;}
 
     // Firmata protocol constants
     static const int MAX_DATA_BYTES                  = 32;
@@ -94,6 +97,7 @@ public slots:
 signals:
 
     void deviceReady();
+    void messageFired(const QString& category, const QString& message);
 
 private slots:
     void initialize();
@@ -104,13 +108,12 @@ private:
 
     // Firmata protocol vars
     std::string firmataName;
+    QString     _deviceName;
     bool        ready;
-    int          majorVersion;
-    int          minorVersion;
-
+    int         majorVersion;
+    int         minorVersion;
 
     // Inputs / outputs status
-
     int analogInputData[10];
     int digitalInputData[10];
     int digitalOutputData[10];

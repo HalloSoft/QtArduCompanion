@@ -18,11 +18,11 @@ SOURCES += \
     mainwidget.cpp
 
 HEADERS +=\
-    firmatator_global.h \
     fdevice.h \
-    firmatator.h \
     util.h \
-    mainwidget.h
+    mainwidget.h \
+    qfirmata_global.h \
+    qfirmata.h
 
 FORMS += \
     mainwidget.ui

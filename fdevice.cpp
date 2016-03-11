@@ -15,6 +15,8 @@ using namespace qfirmata;
 
 FDevice::FDevice(QString serialPortName, int baudrate)
 {
+    _deviceName = "QfDevice";
+
     parserBuffer = (uint8_t*) malloc(4096);
     connected = false;
 
@@ -28,12 +30,9 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     serialPort->setBaudRate(baudrate);
     serialPort->setPort(QSerialPortInfo(serialPortName));
 
-    bool isConnected = false; Q_UNUSED(isConnected);
-    isConnected = connect(serialPort, SIGNAL(readyRead()), this, SLOT(processSerial()));
-    Q_ASSERT(isConnected);
-
-    isConnected = connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
-    Q_ASSERT(isConnected);
+    bool isConnected = false;                                                              Q_UNUSED(isConnected);
+    isConnected = connect(serialPort, SIGNAL(readyRead()),   this, SLOT(processSerial())); Q_ASSERT(isConnected);
+    isConnected = connect(this,       SIGNAL(deviceReady()), this, SLOT(initialize()));    Q_ASSERT(isConnected);
 }
 
 bool FDevice::connectDevice()
@@ -42,6 +41,8 @@ bool FDevice::connectDevice()
 
     if (connected)
         reportFirmware();
+    else
+        emit messageFired(_deviceName, "Device not connected!");
 
     return connected;
 }
@@ -452,6 +453,7 @@ void FDevice::parseBuffer()
     else if (parserBuffer[0] == COMMAND_START_SYSEX && parserBuffer[parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
         qDebug("Sysex");
+        emit messageFired(_deviceName, "SysEx");
 
         if (parserBuffer[1] == COMMAND_REPORT_FIRMWARE)
         {
@@ -472,6 +474,7 @@ void FDevice::parseBuffer()
             firmataName = name;
 
             qDebug() << "Firmata version: " << QString::fromStdString(firmataName);
+            emit messageFired("SysEx", QString::fromStdString(firmataName));
 
             ready = true;
             emit deviceReady();
