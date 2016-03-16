@@ -1,23 +1,18 @@
+#include "fdevice.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 
 #include <QDebug>
 
 #include "util.h"
 
-#include <fdevice.h>
 
 using namespace qfirmata;
-
 
 FDevice::FDevice(QString serialPortName, int baudrate)
 {
     _deviceName = "QfDevice";
 
-    parserBuffer = (uint8_t*) malloc(4096);
+    parserBuffer = (quint8*) malloc(4096);
     connected = false;
 
     if (serialPortName.isEmpty())
@@ -27,12 +22,16 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     }
 
     serialPort = new QSerialPort(); // Cleanup????
+    Q_CHECK_PTR(serialPort);
+
     serialPort->setBaudRate(baudrate);
     serialPort->setPort(QSerialPortInfo(serialPortName));
 
     bool isConnected = false;                                                              Q_UNUSED(isConnected);
     isConnected = connect(serialPort, SIGNAL(readyRead()),   this, SLOT(processSerial())); Q_ASSERT(isConnected);
     isConnected = connect(this,       SIGNAL(deviceReady()), this, SLOT(initialize()));    Q_ASSERT(isConnected);
+
+    Q_CHECK_PTR(serialPort);
 }
 
 bool FDevice::connectDevice()
@@ -55,7 +54,7 @@ void FDevice::disconnectDevice()
 {
     serialPort->close();
     connected = false;
-    ready = false;
+    _ready = false;
 }
 
 void FDevice::initialize()
@@ -181,7 +180,7 @@ void FDevice::pinMode(int pin, int mode)
 
 bool FDevice::available()
 {
-    return connected && ready;
+    return connected && _ready;
 }
 
 
@@ -354,8 +353,8 @@ void FDevice::processSerial()
 
     for (int i = 0; i< r.length(); i++)
     {
-        uint8_t c = r[i];
-        uint8_t msn = c & 0xF0;
+        quint8 c = r[i];
+        quint8 msn = c & 0xF0;
 
         if (msn == COMMAND_ANALOG_MESSAGE || msn == COMMAND_DIGITAL_MESSAGE || c == COMMAND_REPORT_VERSION)
         {
@@ -409,7 +408,7 @@ void FDevice::processSerial()
 void FDevice::parseBuffer()
 {
 
-    uint8_t cmd = (parserBuffer[0] & 0xF0);
+    quint8 cmd = (parserBuffer[0] & 0xF0);
     qDebug() << "COMMAND TO PROCESS;" << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
 
     if (cmd == COMMAND_ANALOG_MESSAGE && parserReceivedCount == 3)
@@ -439,7 +438,7 @@ void FDevice::parseBuffer()
 
             for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
             {
-                    uint32_t val = (port_val & mask) ? 1 : 0;
+                    quint32 val = (port_val & mask) ? 1 : 0;
                     digitalInputData[pin] = val;
 
                     qDebug() << "Set digital pin " << pin << " to value " << val;
@@ -482,10 +481,10 @@ void FDevice::parseBuffer()
             name[len++] = 0;
             firmataName = name;
 
-            qDebug() << "Firmata version: " << QString::fromStdString(firmataName);
-            emit messageFired("SysEx", QString("Firmata-Version: %1").arg(QString::fromStdString(firmataName)));
+            qDebug() << "Firmata version: " << firmataName;
+            emit messageFired("SysEx", QString("Firmata-Version: %1").arg(firmataName));
 
-            ready = true;
+            _ready = true;
             emit deviceReady();
         }
         else if (parserBuffer[1] == COMMAND_CAPABILITY_RESPONSE)

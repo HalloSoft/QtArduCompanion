@@ -6,9 +6,8 @@
  */
 #include "qfirmata_global.h"
 
-#include <string>
 #include <QObject>
-#include <stdint.h>
+//#include <stdint.h>
 
 #include <QSerialPort>
 #include <QSerialPortInfo>
@@ -107,9 +106,9 @@ private:
     void parseBuffer();
 
     // Firmata protocol vars
-    std::string firmataName;
+    QString     firmataName;
     QString     _deviceName;
-    bool        ready;
+    bool        _ready;
     int         majorVersion;
     int         minorVersion;
 
@@ -124,7 +123,7 @@ private:
     bool         connected;
     QString      port;
     int          baud_rate;
-    uint8_t*     parserBuffer;
+    quint8*      parserBuffer;
     int          parserCommandLenght;
     int          parserReceivedCount;
     bool         receiving;
