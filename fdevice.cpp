@@ -39,11 +39,7 @@ bool FDevice::connectDevice()
     connected = serialPort->open(QIODevice::ReadWrite);
 
     if (connected)
-    {
-        reportFirmware();
-
         emit messageFired(_deviceName, QString("Com-Port: %1").arg(serialPort->portName()));
-    }
     else
         emit messageFired(_deviceName, "Device not connected!");
 
@@ -84,18 +80,15 @@ void FDevice::reportFirmware()
 // This informs if a pin can be analog, digital in/out, servo or what (I think);
 void FDevice::requestCapabilities()
 {
-    char* buffer = (char*) malloc(6);
-    int len = 0;
-    buffer[len++] = COMMAND_START_SYSEX;
-    buffer[len++] = COMMAND_ANALOG_MAPPING_QUERY; // read analog to pin # info
-    buffer[len++] = COMMAND_END_SYSEX;
-    buffer[len++] = COMMAND_START_SYSEX;
-    buffer[len++] = COMMAND_CAPABILITY_QUERY; // read capabilities
-    buffer[len++] = COMMAND_END_SYSEX;
+    QByteArray sendCommand;
+    sendCommand.append(COMMAND_START_SYSEX);
+    sendCommand.append(COMMAND_ANALOG_MAPPING_QUERY); // read analog to pin # info
+    sendCommand.append(COMMAND_END_SYSEX);
+    sendCommand.append(COMMAND_START_SYSEX);
+    sendCommand.append(COMMAND_CAPABILITY_QUERY); // read capabilities
+    sendCommand.append(COMMAND_END_SYSEX);
 
-    QByteArray s = QByteArray(buffer, 6);
-
-    serialPort->write(s);
+    serialPort->write(sendCommand);
     serialPort->flush();
 }
 
