@@ -65,15 +65,19 @@ void FDevice::initialize()
 
 void FDevice::reportFirmware()
 {
-    char* buffer = (char*) malloc(3);
+//    char* buffer = (char*) malloc(3);
+//    buffer[0] = COMMAND_START_SYSEX;
+//    buffer[1] = COMMAND_REPORT_FIRMWARE;
+//    buffer[2] = COMMAND_END_SYSEX;
 
-    buffer[0] = COMMAND_START_SYSEX;
-    buffer[1] = COMMAND_REPORT_FIRMWARE;
-    buffer[2] = COMMAND_END_SYSEX;
+//    QByteArray s = QByteArray(buffer, 3);
 
-    QByteArray s = QByteArray(buffer, 3);
+    QByteArray sendCommand;
+    sendCommand.append(COMMAND_START_SYSEX);
+    sendCommand.append(COMMAND_REPORT_FIRMWARE);
+    sendCommand.append(COMMAND_END_SYSEX);
 
-    serialPort->write(s);
+    serialPort->write(sendCommand);
     serialPort->flush();
 }
 
@@ -339,7 +343,7 @@ void FDevice::processSerial()
 {
     if(!serialPort)
     {
-        emit messageFired(_deviceName, "No serial port anymore");
+        emit messageFired(_deviceName, "Serial port isn't there anymore, happy debugging!");
         return;
     }
 
