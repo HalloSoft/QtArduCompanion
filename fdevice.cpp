@@ -12,7 +12,7 @@ FDevice::FDevice(QString serialPortName, int baudrate)
 {
     _deviceName = "QfDevice";
 
-    parserBuffer = (quint8*) malloc(4096);
+    bufferToParse = (quint8*) malloc(4096);
     connected = false;
 
     if (serialPortName.isEmpty())
@@ -195,32 +195,19 @@ void FDevice::digitalWrite(int pin, int value)
     else
          digitalOutputData[portNumber] |= (1 << (pin & 0x07));
 
-    /*
-    char* buffer = (char*) malloc(6);
-    //char buffer[2];
-
-    buffer[1] = lowerToHex(COMMAND_DIGITAL_MESSAGE | portNumber);
-    buffer[0] = upperToHex(COMMAND_DIGITAL_MESSAGE | portNumber);
-    buffer[3] = lowerToHex(digitalOutputData[portNumber] & 0x7F);
-    buffer[2] = upperToHex(digitalOutputData[portNumber] & 0x7F);
-    buffer[5] = lowerToHex(digitalOutputData[portNumber] >> 7);
-    buffer[4] = upperToHex(digitalOutputData[portNumber] >> 7);
-
-    //QByteArray s = QByteArray(buffer, 6);
-    QByteArray s = QByteArray::fromRawData(buffer, 6);
-    qDebug() << s;
-    */
 
     char* buffer = (char*) malloc(3);
     buffer[0] = COMMAND_DIGITAL_MESSAGE | portNumber;
     buffer[1] = digitalOutputData[portNumber] & 0x7F;
     buffer[2] = digitalOutputData[portNumber] >> 7;
-    //QByteArray s = QByteArray::fromRawData(buffer, 3);
     QByteArray s = QByteArray(buffer, 3);
-    //qDebug() << s;
 
-    serialPort->write(s);
-    //qDebug() << serial->bytesToWrite();
+    QByteArray sendCommand;
+    sendCommand.append(COMMAND_DIGITAL_MESSAGE | portNumber);
+    sendCommand.append(digitalOutputData[portNumber] & 0x7F);
+    sendCommand.append(digitalOutputData[portNumber] >> 7);
+
+    serialPort->write(sendCommand);
     serialPort->flush();
 
 
@@ -340,20 +327,16 @@ void FDevice::processSerial()
         return;
     }
 
-    int len = this->serialPort->bytesAvailable();
+    QByteArray seriaPortLine = serialPort->readAll();
 
-    qDebug() << "Read buffer: " << len;
+    //qDebug() << "Data read:" << seriaPortLine;
 
-    QByteArray r = serialPort->readAll();
-
-    //qDebug() << "Data read:" << r;
-
-    for (int i = 0; i< r.length(); i++)
+    for (int i = 0; i< seriaPortLine.length(); i++)
     {
-        quint8 c = r[i];
-        quint8 msn = c & 0xF0;
+        quint8 currentByte = seriaPortLine.at(i);
+        quint8 msn = currentByte & 0xF0;
 
-        if (msn == COMMAND_ANALOG_MESSAGE || msn == COMMAND_DIGITAL_MESSAGE || c == COMMAND_REPORT_VERSION)
+        if (msn == COMMAND_ANALOG_MESSAGE || msn == COMMAND_DIGITAL_MESSAGE || currentByte == COMMAND_REPORT_VERSION)
         {
             parserCommandLenght = 3;
             parserReceivedCount = 0;
@@ -363,16 +346,16 @@ void FDevice::processSerial()
             parserCommandLenght = 2;
             parserReceivedCount = 0;
         }
-        else if (c == COMMAND_START_SYSEX)
+        else if (currentByte == COMMAND_START_SYSEX)
         {
-            parserCommandLenght = 4096; // r.length(); //sizeof(parse_buf);
+            parserCommandLenght = 4096;
             parserReceivedCount = 0;
         }
-        else if (c == COMMAND_END_SYSEX)
+        else if (currentByte == COMMAND_END_SYSEX)
         {
             parserCommandLenght = parserReceivedCount + 1;
         }
-        else if (c & 0x80)
+        else if (currentByte & 0x80)
         {
             parserCommandLenght = 1;
             parserReceivedCount = 0;
@@ -384,7 +367,7 @@ void FDevice::processSerial()
 
         if (parserReceivedCount <= parserCommandLenght)
         {
-            parserBuffer[parserReceivedCount] = c;
+            bufferToParse[parserReceivedCount] = currentByte;
             parserReceivedCount++;
 
             if (parserReceivedCount == parserCommandLenght)
@@ -405,13 +388,13 @@ void FDevice::processSerial()
 void FDevice::parseBuffer()
 {
 
-    quint8 cmd = (parserBuffer[0] & 0xF0);
-    qDebug() << "COMMAND TO PROCESS;" << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
+    quint8 cmd = (bufferToParse[0] & 0xF0);
+    //qDebug() << "COMMAND TO PROCESS;" << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
 
     if (cmd == COMMAND_ANALOG_MESSAGE && parserReceivedCount == 3)
     {
-            int analog_ch = (parserBuffer[0] & 0x0F);
-            int analog_val = parserBuffer[1] | (parserBuffer[2] << 7);
+            int analog_ch = (bufferToParse[0] & 0x0F);
+            int analog_val = bufferToParse[1] | (bufferToParse[2] << 7);
 
             analogInputData[analog_ch] = analog_val;
 
@@ -429,8 +412,8 @@ void FDevice::parseBuffer()
     }
     else if (cmd == COMMAND_DIGITAL_MESSAGE && parserReceivedCount == 3)
     {
-            int port_num = (parserBuffer[0] & 0x0F);
-            int port_val = parserBuffer[1] | (parserBuffer[2] << 7);
+            int port_num = (bufferToParse[0] & 0x0F);
+            int port_val = bufferToParse[1] | (bufferToParse[2] << 7);
             int pin = port_num * 8;
 
             for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
@@ -455,12 +438,12 @@ void FDevice::parseBuffer()
                     */
             }
     }
-    else if (parserBuffer[0] == COMMAND_START_SYSEX && parserBuffer[parserReceivedCount - 1] == COMMAND_END_SYSEX)
+    else if (bufferToParse[0] == COMMAND_START_SYSEX && bufferToParse[parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
         qDebug("Sysex");
         emit messageFired(_deviceName, "SysEx");
 
-        if (parserBuffer[1] == COMMAND_REPORT_FIRMWARE)
+        if (bufferToParse[1] == COMMAND_REPORT_FIRMWARE)
         {
             //qDebug("Firmware report arriving...");
             char name[140];
@@ -468,13 +451,13 @@ void FDevice::parseBuffer()
 
             for (int i = 4; i < parserReceivedCount - 2; i += 2)
             {
-                    name[len++] = (parserBuffer[i] & 0x7F) | ((parserBuffer[i+1] & 0x7F) << 7);
+                    name[len++] = (bufferToParse[i] & 0x7F) | ((bufferToParse[i+1] & 0x7F) << 7);
             }
 
             name[len++] = '-';
-            name[len++] = parserBuffer[2] + '0';
+            name[len++] = bufferToParse[2] + '0';
             name[len++] = '.';
-            name[len++] = parserBuffer[3] + '0';
+            name[len++] = bufferToParse[3] + '0';
             name[len++] = 0;
             firmataName = name;
 
@@ -484,7 +467,7 @@ void FDevice::parseBuffer()
             _ready = true;
             emit deviceReady();
         }
-        else if (parserBuffer[1] == COMMAND_CAPABILITY_RESPONSE)
+        else if (bufferToParse[1] == COMMAND_CAPABILITY_RESPONSE)
         {
                 /*
                 int pin, i, n;
@@ -525,7 +508,7 @@ void FDevice::parseBuffer()
                 }
                 */
         }
-        else if (parserBuffer[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
+        else if (bufferToParse[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
         {
             qDebug() << "COMMAND_ANALOG_MAPPING_RESPONSE";
                 /*
@@ -538,7 +521,7 @@ void FDevice::parseBuffer()
                 return;
                 */
         }
-        else if (parserBuffer[1] == COMMAND_PIN_STATE_RESPONSE && parserReceivedCount >= 6)
+        else if (bufferToParse[1] == COMMAND_PIN_STATE_RESPONSE && parserReceivedCount >= 6)
         {
             qDebug() << "COMMAND_PIN_STATE_RESPONSE";
                 /*
@@ -553,16 +536,16 @@ void FDevice::parseBuffer()
         //elseif (parserBuffer[1] == COMMAND_)
         else
         {
-            qDebug() << "Sysex command not recognized: " << hex << parserBuffer[1];
+            qDebug() << "Sysex command not recognized: " << hex << bufferToParse[1];
         }
     }
     else
     {
-        qDebug() << "Command not recognized: " << hex << parserBuffer[0] << "(" << dec << parserReceivedCount << " parameters)";
+        qDebug() << "Command not recognized: " << hex << bufferToParse[0] << "(" << dec << parserReceivedCount << " parameters)";
 
         for (int i = 0; i < parserReceivedCount; i++)
         {
-            qDebug() << parserBuffer[i] << " / " << hex << parserBuffer[i];
+            qDebug() << bufferToParse[i] << " / " << hex << bufferToParse[i];
         }
     }
 

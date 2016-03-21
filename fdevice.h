@@ -123,7 +123,7 @@ private:
     bool         connected;
     QString      port;
     int          baud_rate;
-    quint8*      parserBuffer;
+    quint8*      bufferToParse;
     int          parserCommandLenght;
     int          parserReceivedCount;
     bool         receiving;
