@@ -369,9 +369,9 @@ void FDevice::parseBuffer()
 
             for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
             {
-                Q_ASSERT_X(pin < 10, "parseBuffer", "BuffereOverflow (_digitalInputData)");
                 quint32 val = (port_val & mask) ? 1 : 0;
-                _digitalInputData[pin] = val;
+                if(pin < DIGITALINPUTDTALENGTH)
+                    _digitalInputData[pin] = val;
             }
     }
     else if (_bufferToParse[0] == COMMAND_START_SYSEX && _bufferToParse[_parserReceivedCount - 1] == COMMAND_END_SYSEX)

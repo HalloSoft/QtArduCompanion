@@ -12,6 +12,8 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
+#define DIGITALINPUTDTALENGTH 10
+
 namespace qfirmata
 {
 class FDevice : public QObject
@@ -114,7 +116,7 @@ private:
 
     // Inputs / outputs status
     int _analogInputData[10];
-    int _digitalInputData[10];
+    int _digitalInputData[DIGITALINPUTDTALENGTH];
     int _digitalOutputData[10];
 
 
