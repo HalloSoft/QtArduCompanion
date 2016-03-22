@@ -12,8 +12,8 @@ FDevice::FDevice(QString serialPortName, int baudrate)
 {
     _deviceName = "QfDevice";
 
-    bufferToParse = (quint8*) malloc(4096);
-    connected = false;
+    _bufferToParse = (quint8*) malloc(4096);
+    _connected = false;
 
     if (serialPortName.isEmpty())
     {
@@ -21,35 +21,35 @@ FDevice::FDevice(QString serialPortName, int baudrate)
         serialPortName = list.value(0).portName();
     }
 
-    serialPort = new QSerialPort(); // Cleanup????
-    Q_CHECK_PTR(serialPort);
+    _serialPort = new QSerialPort(); // Cleanup????
+    Q_CHECK_PTR(_serialPort);
 
-    serialPort->setBaudRate(baudrate);
-    serialPort->setPort(QSerialPortInfo(serialPortName));
+    _serialPort->setBaudRate(baudrate);
+    _serialPort->setPort(QSerialPortInfo(serialPortName));
 
-    bool isConnected = false;                                                              Q_UNUSED(isConnected);
-    isConnected = connect(serialPort, SIGNAL(readyRead()),   this, SLOT(processSerial())); Q_ASSERT(isConnected);
-    isConnected = connect(this,       SIGNAL(deviceReady()), this, SLOT(initialize()));    Q_ASSERT(isConnected);
+    bool isConnected = false;                                                               Q_UNUSED(isConnected);
+    isConnected = connect(_serialPort, SIGNAL(readyRead()),   this, SLOT(processSerial())); Q_ASSERT(isConnected);
+    isConnected = connect(this,        SIGNAL(deviceReady()), this, SLOT(initialize()));    Q_ASSERT(isConnected);
 
-    Q_CHECK_PTR(serialPort);
+    Q_CHECK_PTR(_serialPort);
 }
 
 bool FDevice::connectDevice()
 {
-    connected = serialPort->open(QIODevice::ReadWrite);
+    _connected = _serialPort->open(QIODevice::ReadWrite);
 
-    if (connected)
-        emit messageFired(_deviceName, QString("Com-Port: %1").arg(serialPort->portName()));
+    if (_connected)
+        emit messageFired(_deviceName, QString("Com-Port: %1").arg(_serialPort->portName()));
     else
         emit messageFired(_deviceName, "Device not connected!");
 
-    return connected;
+    return _connected;
 }
 
 void FDevice::disconnectDevice()
 {
-    serialPort->close();
-    connected = false;
+    _serialPort->close();
+    _connected = false;
     _ready = false;
 }
 
@@ -61,20 +61,13 @@ void FDevice::initialize()
 
 void FDevice::reportFirmware()
 {
-//    char* buffer = (char*) malloc(3);
-//    buffer[0] = COMMAND_START_SYSEX;
-//    buffer[1] = COMMAND_REPORT_FIRMWARE;
-//    buffer[2] = COMMAND_END_SYSEX;
-
-//    QByteArray s = QByteArray(buffer, 3);
-
     QByteArray sendCommand;
     sendCommand.append(COMMAND_START_SYSEX);
     sendCommand.append(COMMAND_REPORT_FIRMWARE);
     sendCommand.append(COMMAND_END_SYSEX);
 
-    serialPort->write(sendCommand);
-    serialPort->flush();
+    _serialPort->write(sendCommand);
+    _serialPort->flush();
 }
 
 // This informs if a pin can be analog, digital in/out, servo or what (I think);
@@ -88,8 +81,8 @@ void FDevice::requestCapabilities()
     sendCommand.append(COMMAND_CAPABILITY_QUERY); // read capabilities
     sendCommand.append(COMMAND_END_SYSEX);
 
-    serialPort->write(sendCommand);
-    serialPort->flush();
+    _serialPort->write(sendCommand);
+    _serialPort->flush();
 }
 
 // Check what the hell makes the REPORT_ANALOG / REPORT_DIGITAL
@@ -104,9 +97,8 @@ void FDevice::reportPins()
         buffer[1] = 1;
 
         QByteArray s = QByteArray(buffer, 2);
-        serialPort->write(s);
-        serialPort->flush();
-        //qDebug() << "Pido analogica " << i;
+        _serialPort->write(s);
+        _serialPort->flush();
     }
 
     for (int i = 0; i < 2; i++)
@@ -115,9 +107,8 @@ void FDevice::reportPins()
         buffer[1] = 1;
 
         QByteArray s = QByteArray(buffer, 2);
-        serialPort->write(s);
-        serialPort->flush();
-        //qDebug() << "Pido digital " << i;
+        _serialPort->write(s);
+        _serialPort->flush();
      }
 }
 
@@ -136,88 +127,56 @@ void FDevice::requestInputs()
 
         QByteArray s = QByteArray(buffer, 4);
 
-        serialPort->write(s);
-        serialPort->flush();
+        _serialPort->write(s);
+        _serialPort->flush();
     }
 }
 
 void FDevice::pinMode(int pin, int mode)
 {
-    /*
-    char* buffer = (char*) malloc(6);
-    //char buffer[2];
-    buffer[1] = lowerToHex(COMMAND_SET_PIN_MODE);
-    buffer[0] = upperToHex(COMMAND_SET_PIN_MODE);
-    buffer[3] = lowerToHex(pin);
-    buffer[2] = upperToHex(pin);
-    buffer[5] = lowerToHex(mode);
-    buffer[4] = upperToHex(mode);
-    //qDebug() << buffer;
-
-    //QByteArray s = QByteArray(buffer, 6);
-    QByteArray s = QByteArray::fromRawData(buffer, 6);
-    qDebug() << s;
-    //serial->write(QByteArray(buffer), 2);
-    */
 
     char* buffer = (char*) malloc(3);
     buffer[0] = COMMAND_SET_PIN_MODE;
     buffer[1] = pin;
     buffer[2] = mode;
-    //QByteArray s = QByteArray::fromRawData(buffer, 3);
     QByteArray s = QByteArray(buffer, 3);
-    //qDebug() << s;
 
-    serialPort->write(s);
-    //qDebug() << serial->bytesToWrite();
-    serialPort->flush();
-
-    //qDebug() << "Command: " << (char)(COMMAND_SET_PIN_MODE) << "  --  " << upperToHex(COMMAND_SET_PIN_MODE) << lowerToHex(COMMAND_SET_PIN_MODE) << " / Pin: " << lowerToHex(pin) << " / Mode: " << lowerToHex(mode);
+    _serialPort->write(s);
+    _serialPort->flush();
 }
 
 bool FDevice::available()
 {
-    return connected && _ready;
+    return _connected && _ready;
 }
-
 
 int FDevice::digitalRead(int pin)
 {
-    return digitalInputData[pin];
+    return _digitalInputData[pin];
 }
 
 void FDevice::digitalWrite(int pin, int value)
 {
     int portNumber = (pin >> 3) & 0x0F;
+    Q_ASSERT_X(portNumber < 10, "digitalWrite", "bufferOverflow");
 
     if (value == 0)
-         digitalOutputData[portNumber] &= ~(1 << (pin & 0x07));
+         _digitalOutputData[portNumber] &= ~(1 << (pin & 0x07));
     else
-         digitalOutputData[portNumber] |= (1 << (pin & 0x07));
-
-
-    char* buffer = (char*) malloc(3);
-    buffer[0] = COMMAND_DIGITAL_MESSAGE | portNumber;
-    buffer[1] = digitalOutputData[portNumber] & 0x7F;
-    buffer[2] = digitalOutputData[portNumber] >> 7;
-    QByteArray s = QByteArray(buffer, 3);
+         _digitalOutputData[portNumber] |= (1 << (pin & 0x07));
 
     QByteArray sendCommand;
     sendCommand.append(COMMAND_DIGITAL_MESSAGE | portNumber);
-    sendCommand.append(digitalOutputData[portNumber] & 0x7F);
-    sendCommand.append(digitalOutputData[portNumber] >> 7);
+    sendCommand.append(_digitalOutputData[portNumber] & 0x7F);
+    sendCommand.append(_digitalOutputData[portNumber] >> 7);
 
-    serialPort->write(sendCommand);
-    serialPort->flush();
-
-
-    //qDebug() << "Digital Port Number (Internal array):" <<  digitalOutputData[portNumber];
-    //qDebug() << "Command: " << lowerToHex(COMMAND_DIGITAL_MESSAGE | portNumber) << " / LSB: " << lowerToHex(digitalOutputData[portNumber] & 0x7F) << " / MSB: " << lowerToHex(digitalOutputData[portNumber] >> 7);
+    _serialPort->write(sendCommand);
+    _serialPort->flush();
 }
 
 int FDevice::analogRead(int pin)
 {
-    return analogInputData[pin - 14];
+    return _analogInputData[pin - 14];
 }
 
 void FDevice::analogWrite(int pin, int value)
@@ -232,9 +191,9 @@ void FDevice::analogWrite(int pin, int value)
     QByteArray s = QByteArray(buffer, 3);
     //qDebug() << s;
 
-    serialPort->write(s);
+    _serialPort->write(s);
     //qDebug() << serial->bytesToWrite();
-    serialPort->flush();
+    _serialPort->flush();
 
 }
 
@@ -279,9 +238,9 @@ void FDevice::I2CRequest(int addr, int data[], int mode)
     QByteArray s = QByteArray(buffer, pos);
     //qDebug() << s;
 
-    serialPort->write(s);
+    _serialPort->write(s);
     //qDebug() << serial->bytesToWrite();
-    serialPort->flush();
+    _serialPort->flush();
 
     qDebug() << "";
     qDebug() << "Envio I2C Request:";
@@ -309,9 +268,9 @@ void FDevice::I2CConfig(int pinState, int delay)
     QByteArray s = QByteArray(buffer, pos);
     //qDebug() << s;
 
-    serialPort->write(s);
+    _serialPort->write(s);
     //qDebug() << serial->bytesToWrite();
-    serialPort->flush();
+    _serialPort->flush();
 
     for (int i = 0; i < s.size(); i++)
     {
@@ -321,66 +280,68 @@ void FDevice::I2CConfig(int pinState, int delay)
 
 void FDevice::processSerial()
 {
-    if(!serialPort)
+    if(!_serialPort)
     {
         emit messageFired(_deviceName, "Serial port isn't there anymore, happy debugging!");
         return;
     }
 
-    QByteArray seriaPortLine = serialPort->readAll();
+    QByteArray seriaPortLine = _serialPort->readAll();
 
     //qDebug() << "Data read:" << seriaPortLine;
 
-    for (int i = 0; i< seriaPortLine.length(); i++)
+    Q_ASSERT_X(seriaPortLine.length() <= 4096, "processSerial", "Bufferoverflow");
+
+    for (int i = 0; i < seriaPortLine.length(); i++)
     {
         quint8 currentByte = seriaPortLine.at(i);
         quint8 msn = currentByte & 0xF0;
 
         if (msn == COMMAND_ANALOG_MESSAGE || msn == COMMAND_DIGITAL_MESSAGE || currentByte == COMMAND_REPORT_VERSION)
         {
-            parserCommandLenght = 3;
-            parserReceivedCount = 0;
+            _parserCommandLenght = 3;
+            _parserReceivedCount = 0;
         }
         else if (msn == COMMAND_REPORT_ANALOG || msn == COMMAND_REPORT_DIGITAL)
         {
-            parserCommandLenght = 2;
-            parserReceivedCount = 0;
+            _parserCommandLenght = 2;
+            _parserReceivedCount = 0;
         }
         else if (currentByte == COMMAND_START_SYSEX)
         {
-            parserCommandLenght = 4096;
-            parserReceivedCount = 0;
+            _parserCommandLenght = 4096;
+            _parserReceivedCount = 0;
         }
         else if (currentByte == COMMAND_END_SYSEX)
         {
-            parserCommandLenght = parserReceivedCount + 1;
+            _parserCommandLenght = _parserReceivedCount + 1;
         }
         else if (currentByte & 0x80)
         {
-            parserCommandLenght = 1;
-            parserReceivedCount = 0;
+            _parserCommandLenght = 1;
+            _parserReceivedCount = 0;
         }
 
 
         //qDebug() << "Constructing command... " << parserReceivedCount + 1 << "  /  " << parserCommandLenght;
 
 
-        if (parserReceivedCount <= parserCommandLenght)
+        if (_parserReceivedCount <= _parserCommandLenght)
         {
-            bufferToParse[parserReceivedCount] = currentByte;
-            parserReceivedCount++;
+            _bufferToParse[_parserReceivedCount] = currentByte;
+            _parserReceivedCount++;
 
-            if (parserReceivedCount == parserCommandLenght)
+            if (_parserReceivedCount == _parserCommandLenght)
             {
-                receiving = false;
+                _receiving = false;
                 parseBuffer();
-                parserReceivedCount = parserCommandLenght = 0;
+                _parserReceivedCount = _parserCommandLenght = 0;
             }
         }
-        else if (parserReceivedCount >= parserCommandLenght - 1)
+        else if (_parserReceivedCount >= _parserCommandLenght - 1)
         {
-            receiving = false;
-            parserReceivedCount = parserCommandLenght = 0;
+            _receiving = false;
+            _parserReceivedCount = _parserCommandLenght = 0;
         }
     }
 }
@@ -388,86 +349,59 @@ void FDevice::processSerial()
 void FDevice::parseBuffer()
 {
 
-    quint8 cmd = (bufferToParse[0] & 0xF0);
-    //qDebug() << "COMMAND TO PROCESS;" << hex << cmd << " with " << dec << parserReceivedCount << " paramenters.";
+    quint8 cmd = (_bufferToParse[0] & 0xF0);
 
-    if (cmd == COMMAND_ANALOG_MESSAGE && parserReceivedCount == 3)
+    if (cmd == COMMAND_ANALOG_MESSAGE && _parserReceivedCount == 3)
     {
-            int analog_ch = (bufferToParse[0] & 0x0F);
-            int analog_val = bufferToParse[1] | (bufferToParse[2] << 7);
+            int analog_ch = (_bufferToParse[0] & 0x0F);
+            int analog_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
 
-            analogInputData[analog_ch] = analog_val;
+            Q_ASSERT_X(analog_ch < 10, "parseBuffer", "BuffereOverflow (_analogInputData)");
 
-            //qDebug() << "Set analog channel " << analog_ch << " to value " << analog_val;
-            /*for (int pin=0; pin < 128; pin++)
-            {
+            _analogInputData[analog_ch] = analog_val;
 
-                    if (pin_info[pin].analog_channel == analog_ch)
-                    {
-
-                        //pin_info[pin].value = analog_val;
-                        //printf("pin %d is A%d = %d\n", pin, analog_ch, analog_val);
-                    }
-            }*/
     }
-    else if (cmd == COMMAND_DIGITAL_MESSAGE && parserReceivedCount == 3)
+    else if (cmd == COMMAND_DIGITAL_MESSAGE && _parserReceivedCount == 3)
     {
-            int port_num = (bufferToParse[0] & 0x0F);
-            int port_val = bufferToParse[1] | (bufferToParse[2] << 7);
+            int port_num = (_bufferToParse[0] & 0x0F);
+            int port_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
             int pin = port_num * 8;
 
             for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
             {
-                    quint32 val = (port_val & mask) ? 1 : 0;
-                    digitalInputData[pin] = val;
-
-                    qDebug() << "Set digital pin " << pin << " to value " << val;
-                    /*
-                    if (pin_info[pin].mode == MODE_INPUT)
-                    {
-                            uint32_t val = (port_val & mask) ? 1 : 0;
-                            if (pin_info[pin].value != val)
-                            {
-                                    printf("pin %d is %d\n", pin, val);
-                                    wxStaticText *text = (wxStaticText *)
-                                      FindWindowById(5000 + pin, scroll);
-                                    if (text) text->SetLabel(val ? "High" : "Low");
-                                    pin_info[pin].value = val;
-                            }
-                    }
-                    */
+                Q_ASSERT_X(pin < 10, "parseBuffer", "BuffereOverflow (_digitalInputData)");
+                quint32 val = (port_val & mask) ? 1 : 0;
+                _digitalInputData[pin] = val;
             }
     }
-    else if (bufferToParse[0] == COMMAND_START_SYSEX && bufferToParse[parserReceivedCount - 1] == COMMAND_END_SYSEX)
+    else if (_bufferToParse[0] == COMMAND_START_SYSEX && _bufferToParse[_parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
         qDebug("Sysex");
         emit messageFired(_deviceName, "SysEx");
 
-        if (bufferToParse[1] == COMMAND_REPORT_FIRMWARE)
+        if (_bufferToParse[1] == COMMAND_REPORT_FIRMWARE)
         {
-            //qDebug("Firmware report arriving...");
             char name[140];
             int len = 0;
 
-            for (int i = 4; i < parserReceivedCount - 2; i += 2)
+            for (int i = 4; i < _parserReceivedCount - 2; i += 2)
             {
-                    name[len++] = (bufferToParse[i] & 0x7F) | ((bufferToParse[i+1] & 0x7F) << 7);
+                    name[len++] = (_bufferToParse[i] & 0x7F) | ((_bufferToParse[i+1] & 0x7F) << 7);
             }
 
             name[len++] = '-';
-            name[len++] = bufferToParse[2] + '0';
+            name[len++] = _bufferToParse[2] + '0';
             name[len++] = '.';
-            name[len++] = bufferToParse[3] + '0';
+            name[len++] = _bufferToParse[3] + '0';
             name[len++] = 0;
-            firmataName = name;
+            _firmataName = name;
 
-            qDebug() << "Firmata version: " << firmataName;
-            emit messageFired("SysEx", QString("Firmata-Version: %1").arg(firmataName));
+            emit messageFired("SysEx", QString("Firmata-Version: %1").arg(_firmataName));
 
             _ready = true;
             emit deviceReady();
         }
-        else if (bufferToParse[1] == COMMAND_CAPABILITY_RESPONSE)
+        else if (_bufferToParse[1] == COMMAND_CAPABILITY_RESPONSE)
         {
                 /*
                 int pin, i, n;
@@ -508,7 +442,7 @@ void FDevice::parseBuffer()
                 }
                 */
         }
-        else if (bufferToParse[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
+        else if (_bufferToParse[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
         {
             qDebug() << "COMMAND_ANALOG_MAPPING_RESPONSE";
                 /*
@@ -521,7 +455,7 @@ void FDevice::parseBuffer()
                 return;
                 */
         }
-        else if (bufferToParse[1] == COMMAND_PIN_STATE_RESPONSE && parserReceivedCount >= 6)
+        else if (_bufferToParse[1] == COMMAND_PIN_STATE_RESPONSE && _parserReceivedCount >= 6)
         {
             qDebug() << "COMMAND_PIN_STATE_RESPONSE";
                 /*
@@ -536,16 +470,16 @@ void FDevice::parseBuffer()
         //elseif (parserBuffer[1] == COMMAND_)
         else
         {
-            qDebug() << "Sysex command not recognized: " << hex << bufferToParse[1];
+            qDebug() << "Sysex command not recognized: " << hex << _bufferToParse[1];
         }
     }
     else
     {
-        qDebug() << "Command not recognized: " << hex << bufferToParse[0] << "(" << dec << parserReceivedCount << " parameters)";
+        qDebug() << "Command not recognized: " << hex << _bufferToParse[0] << "(" << dec << _parserReceivedCount << " parameters)";
 
-        for (int i = 0; i < parserReceivedCount; i++)
+        for (int i = 0; i < _parserReceivedCount; i++)
         {
-            qDebug() << bufferToParse[i] << " / " << hex << bufferToParse[i];
+            qDebug() << _bufferToParse[i] << " / " << hex << _bufferToParse[i];
         }
     }
 

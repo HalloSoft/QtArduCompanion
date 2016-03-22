@@ -19,7 +19,7 @@ class FDevice : public QObject
     Q_OBJECT
 
 public:
-    FDevice(QString serialPortName = QString(), int baud_rate = 57600);
+    FDevice(QString serialPortName = QString(), int _baud_rate = 57600);
     bool connectDevice(); // TODO: maybe const
     void disconnectDevice();
     bool available();
@@ -106,27 +106,26 @@ private:
     void parseBuffer();
 
     // Firmata protocol vars
-    QString     firmataName;
+    QString     _firmataName;
     QString     _deviceName;
     bool        _ready;
-    int         majorVersion;
-    int         minorVersion;
+    int         _majorVersion;
+    int         _minorVersion;
 
     // Inputs / outputs status
-    int analogInputData[10];
-    int digitalInputData[10];
-    int digitalOutputData[10];
+    int _analogInputData[10];
+    int _digitalInputData[10];
+    int _digitalOutputData[10];
 
 
     // Serial connection vars
-    QSerialPort* serialPort;
-    bool         connected;
-    QString      port;
-    int          baud_rate;
-    quint8*      bufferToParse;
-    int          parserCommandLenght;
-    int          parserReceivedCount;
-    bool         receiving;
+    QSerialPort* _serialPort;
+    bool         _connected;
+    int          _baud_rate;
+    quint8*      _bufferToParse;
+    int          _parserCommandLenght;
+    int          _parserReceivedCount;
+    bool         _receiving;           // TODO: check this variable ans its usage
 
 };
 } // namespace
