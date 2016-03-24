@@ -1,5 +1,5 @@
-#ifndef FIRMATATOR_H
-#define FIRMATATOR_H
+#ifndef FDEVICE_H
+#define FDEVICE_H
 
 /*
  * Originaliy from: https://github.com/dh1tw/firmatator
@@ -12,8 +12,9 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
-#define DIGITALINPUTDTALENGTH 10
-
+#define ANALOGINPUTDATALENGTH   10
+#define DIGITALINPUTDATALENGTH  10
+#define DIGITALOUTPUTDATALENGTH 10
 namespace qfirmata
 {
 class FDevice : public QObject
@@ -32,7 +33,7 @@ public:
     void requestInputs();
 
     void pinMode(int pin, int mode);
-    int  digitalRead(int pin);
+    bool digitalRead(int pin);
     void digitalWrite(int pin, int value);
     int  analogRead(int pin);
     void analogWrite(int pin, int value);
@@ -115,9 +116,9 @@ private:
     int         _minorVersion;
 
     // Inputs / outputs status
-    int _analogInputData[10];
-    int _digitalInputData[DIGITALINPUTDTALENGTH];
-    int _digitalOutputData[10];
+    int _analogInputData[ANALOGINPUTDATALENGTH];
+    bool _digitalInputData[DIGITALINPUTDATALENGTH];
+    int _digitalOutputData[DIGITALOUTPUTDATALENGTH];
 
 
     // Serial connection vars
@@ -132,4 +133,4 @@ private:
 };
 } // namespace
 
-#endif // FIRMATATOR_H
+#endif // FDEVICE_H
