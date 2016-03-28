@@ -288,7 +288,7 @@ void FDevice::processSerial()
 
     QByteArray seriaPortLine = _serialPort->readAll();
 
-    qDebug() << "Data read:" <<  hex << seriaPortLine;
+    //qDebug() << "Data read:" <<  hex << seriaPortLine;
 
     Q_ASSERT_X(seriaPortLine.length() <= 4096, "processSerial", "Bufferoverflow");
 

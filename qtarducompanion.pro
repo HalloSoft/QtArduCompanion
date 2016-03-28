@@ -1,6 +1,7 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2012-05-04T18:10:33
+# QtArduCompanion
+# ScarySoft 2016
 #
 #-------------------------------------------------
 
@@ -15,15 +16,20 @@ SOURCES += \
     fdevice.cpp \
     util.cpp \
     main.cpp \
-    mainwidget.cpp
+    mainwidget.cpp \
+    arducontrolwindow.cpp \
+    pincontrolrow.cpp
 
 HEADERS +=\
     fdevice.h \
     util.h \
     mainwidget.h \
     qfirmata_global.h \
-    qfirmata.h
+    qfirmata.h \
+    arducontrolwindow.h \
+    pincontrolrow.h
 
 FORMS += \
-    mainwidget.ui
+    mainwidget.ui \
+    arducontrolwindow.ui
 
