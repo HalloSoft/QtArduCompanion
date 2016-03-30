@@ -1,8 +1,10 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2012-05-04T18:10:33
+# QtArduCompanion
+# ScarySoft 2016
 #
 #-------------------------------------------------
+CONFIG += c++11
 
 QT       += widgets serialport
 
@@ -15,15 +17,29 @@ SOURCES += \
     fdevice.cpp \
     util.cpp \
     main.cpp \
-    mainwidget.cpp
+    mainwidget.cpp \
+    arducontrolwindow.cpp \
+    pincontrolrow.cpp \
+    inputwidget.cpp \
+    outputwidget.cpp
 
 HEADERS +=\
     fdevice.h \
     util.h \
     mainwidget.h \
     qfirmata_global.h \
-    qfirmata.h
+    qfirmata.h \
+    arducontrolwindow.h \
+    pincontrolrow.h \
+    inputwidget.h \
+    outputwidget.h
 
 FORMS += \
-    mainwidget.ui
+    mainwidget.ui \
+    arducontrolwindow.ui \
+    inputwidget.ui \
+    outputwidget.ui
+
+RESOURCES += \
+    icons.qrc
 

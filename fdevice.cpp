@@ -150,7 +150,7 @@ bool FDevice::available()
     return _connected && _ready;
 }
 
-int FDevice::digitalRead(int pin)
+bool FDevice::digitalRead(int pin)
 {
     return _digitalInputData[pin];
 }
@@ -158,7 +158,7 @@ int FDevice::digitalRead(int pin)
 void FDevice::digitalWrite(int pin, int value)
 {
     int portNumber = (pin >> 3) & 0x0F;
-    Q_ASSERT_X(portNumber < 10, "digitalWrite", "bufferOverflow");
+    Q_ASSERT_X(portNumber < DIGITALOUTPUTDATALENGTH, "digitalWrite", "bufferOverflow");
 
     if (value == 0)
          _digitalOutputData[portNumber] &= ~(1 << (pin & 0x07));
@@ -288,7 +288,7 @@ void FDevice::processSerial()
 
     QByteArray seriaPortLine = _serialPort->readAll();
 
-    //qDebug() << "Data read:" << seriaPortLine;
+    //qDebug() << "Data read:" <<  hex << seriaPortLine;
 
     Q_ASSERT_X(seriaPortLine.length() <= 4096, "processSerial", "Bufferoverflow");
 
@@ -356,7 +356,7 @@ void FDevice::parseBuffer()
             int analog_ch = (_bufferToParse[0] & 0x0F);
             int analog_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
 
-            Q_ASSERT_X(analog_ch < 10, "parseBuffer", "BuffereOverflow (_analogInputData)");
+            Q_ASSERT_X(analog_ch < ANALOGINPUTDATALENGTH, "parseBuffer", "BuffereOverflow (_analogInputData)");
 
             _analogInputData[analog_ch] = analog_val;
 
@@ -369,10 +369,11 @@ void FDevice::parseBuffer()
 
             for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
             {
-                quint32 val = (port_val & mask) ? 1 : 0;
-                if(pin < DIGITALINPUTDTALENGTH)
+                bool val = (port_val & mask) ? true : false;
+                if(pin < DIGITALINPUTDATALENGTH)
                     _digitalInputData[pin] = val;
             }
+
     }
     else if (_bufferToParse[0] == COMMAND_START_SYSEX && _bufferToParse[_parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
