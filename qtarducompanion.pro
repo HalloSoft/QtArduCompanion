@@ -4,6 +4,7 @@
 # ScarySoft 2016
 #
 #-------------------------------------------------
+CONFIG += c++11
 
 QT       += widgets serialport
 
@@ -18,7 +19,9 @@ SOURCES += \
     main.cpp \
     mainwidget.cpp \
     arducontrolwindow.cpp \
-    pincontrolrow.cpp
+    pincontrolrow.cpp \
+    inputwidget.cpp \
+    outputwidget.cpp
 
 HEADERS +=\
     fdevice.h \
@@ -27,9 +30,16 @@ HEADERS +=\
     qfirmata_global.h \
     qfirmata.h \
     arducontrolwindow.h \
-    pincontrolrow.h
+    pincontrolrow.h \
+    inputwidget.h \
+    outputwidget.h
 
 FORMS += \
     mainwidget.ui \
-    arducontrolwindow.ui
+    arducontrolwindow.ui \
+    inputwidget.ui \
+    outputwidget.ui
+
+RESOURCES += \
+    icons.qrc
 

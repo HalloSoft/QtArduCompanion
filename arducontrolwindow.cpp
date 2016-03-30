@@ -49,15 +49,18 @@ void ArduControlWindow::initializeDvice()
 void ArduControlWindow::initializeTreeHeaders()
 {
     QStringList headers;
-    headers << tr("Pin") << tr("Pin-Mode") << tr("Input") << tr("Output");
+    headers << tr("Pin") << tr("Pin-Mode") << tr("Output") << tr("Input");
     ui->treeWidget->setHeaderLabels(headers);
 
+    ui->treeWidget->setColumnWidth(2, 200);
 }
 
 void ArduControlWindow::initializeTreeWidgetRows()
 {
     ui->treeWidget->setColumnCount(4);
-    PinControlRow *row1 = new PinControlRow(ui->treeWidget, tr("Pin 13"));
-    row1->setEnabled(false);
+    PinControlRow *row1 = new PinControlRow(ui->treeWidget, 13);
+    row1->setEnabled( true);
+    PinControlRow *row2 = new PinControlRow(ui->treeWidget, 14);
+    row2->setEnabled(false);
 
 }

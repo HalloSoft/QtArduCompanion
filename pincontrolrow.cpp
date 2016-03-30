@@ -1,22 +1,27 @@
 #include "pincontrolrow.h"
 
+#include "inputwidget.h"
+#include "outputwidget.h"
+
 #include <QComboBox>
 
-PinControlRow::PinControlRow(QTreeWidget *parent, const QString &name) :
+PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
     //QObject(0),
     QTreeWidgetItem(parent)
 {
-    setText(0, name);
-
-    _mode = mInput;
+    setText(0, QString("Pin %1").arg(pinNumber));
 
     _modeComboBox = new QComboBox;
     _modeComboBox->addItem(tr("In"));
     _modeComboBox->addItem(tr("Out"));
 
+
+    _outputWidget = new OutputWidget;
     if(parent)
     {
         parent->setItemWidget(this, 1, _modeComboBox);
+        parent->setItemWidget(this, 2, _outputWidget);
+        parent->setItemWidget(this, 3, new InputWidget);
     }
 
     bool isConnected = false;                                                                      Q_UNUSED(isConnected);
