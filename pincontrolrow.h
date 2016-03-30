@@ -5,6 +5,7 @@
 
 class QComboBox;
 class OutputWidget;
+class InputWidget;
 
 class PinControlRow : public QObject, public QTreeWidgetItem
 {
@@ -17,6 +18,8 @@ class PinControlRow : public QObject, public QTreeWidgetItem
 
 public:
     PinControlRow(QTreeWidget *parent, quint16 pinNumber);
+    ~PinControlRow();
+
     void setEnabled(bool enabled);
 
 public slots:
@@ -31,6 +34,7 @@ private:
     quint16       _pinNumber {0};
     QComboBox    *_modeComboBox {0};
     OutputWidget *_outputWidget {0};
+    InputWidget  *_inputWidget {0};
     eMode         _mode {mInput};
 };
 

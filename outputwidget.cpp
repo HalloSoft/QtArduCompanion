@@ -12,3 +12,10 @@ OutputWidget::~OutputWidget()
 {
     delete ui;
 }
+
+void OutputWidget::setEnabled(bool enable)
+{
+    ui->pushButtonOff->setEnabled(enable);
+    ui->pushButtonOn->setEnabled(enable);
+    ui->pushButtonToggle->setEnabled(enable);
+}

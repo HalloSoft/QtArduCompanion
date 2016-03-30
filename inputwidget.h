@@ -15,6 +15,8 @@ public:
     explicit InputWidget(QWidget *parent = 0);
     ~InputWidget();
 
+    void setEnabled(bool eneable);
+
 private:
     Ui::InputWidget *ui;
 };

@@ -12,3 +12,8 @@ InputWidget::~InputWidget()
 {
     delete ui;
 }
+
+void InputWidget::setEnabled(bool eneable)
+{
+    // TODO:
+}

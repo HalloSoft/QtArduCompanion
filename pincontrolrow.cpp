@@ -6,22 +6,22 @@
 #include <QComboBox>
 
 PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
-    //QObject(0),
     QTreeWidgetItem(parent)
 {
     setText(0, QString("Pin %1").arg(pinNumber));
 
-    _modeComboBox = new QComboBox;
+    _modeComboBox = new QComboBox(parent);
     _modeComboBox->addItem(tr("In"));
     _modeComboBox->addItem(tr("Out"));
 
+    _outputWidget = new OutputWidget(parent);
+    _inputWidget = new InputWidget(parent);
 
-    _outputWidget = new OutputWidget;
     if(parent)
     {
         parent->setItemWidget(this, 1, _modeComboBox);
         parent->setItemWidget(this, 2, _outputWidget);
-        parent->setItemWidget(this, 3, new InputWidget);
+        parent->setItemWidget(this, 3, _inputWidget);
     }
 
     bool isConnected = false;                                                                      Q_UNUSED(isConnected);
@@ -29,9 +29,16 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
 
 }
 
+PinControlRow::~PinControlRow()
+{
+
+}
+
 void PinControlRow::setEnabled(bool enabled)
 {
     _modeComboBox->setEnabled(enabled);
+    _outputWidget->setEnabled(enabled);
+    _inputWidget->setEnabled(enabled);
 }
 
 void PinControlRow::setMode()

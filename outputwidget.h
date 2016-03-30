@@ -15,6 +15,8 @@ public:
     explicit OutputWidget(QWidget *parent = 0);
     ~OutputWidget();
 
+    void setEnabled(bool enable);
+
 private:
     Ui::OutputWidget *ui;
 };
