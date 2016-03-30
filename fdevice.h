@@ -64,32 +64,32 @@ public:
     static const int I2C_MODE_READ_CONSTINOUSLY      = 2;
     static const int I2C_MODE_READ_STOP              = 3;
 
-    static const int COMMAND_REPORT_VERSION          = 0xF9; // report firmware version
-    static const int COMMAND_SYSTEM_RESET            = 0xFF; // reset from MIDI
-    static const int COMMAND_SET_PIN_MODE            = 0xF4; // set a pin to INPUT/OUTPUT/PWM/etc
-    static const int COMMAND_DIGITAL_MESSAGE         = 0x90; // send data for a digital port
-    static const int COMMAND_ANALOG_MESSAGE          = 0xE0; // send data for an analog pin (or PWM)
-    static const int COMMAND_REPORT_ANALOG           = 0xC0; // enable analog input by pin #
-    static const int COMMAND_REPORT_DIGITAL          = 0xD0; // enable digital input by port
-    static const int COMMAND_SERVO_CONFIG            = 0x70; // set the parameters for a servo pin (max and min pulse, max and min angle)
+    static const quint8 COMMAND_REPORT_VERSION          = 0xF9; // report firmware version
+    static const quint8 COMMAND_SYSTEM_RESET            = 0xFF; // reset from MIDI
+    static const quint8 COMMAND_SET_PIN_MODE            = 0xF4; // set a pin to INPUT/OUTPUT/PWM/etc
+    static const quint8 COMMAND_DIGITAL_MESSAGE         = 0x90; // send data for a digital port
+    static const quint8 COMMAND_ANALOG_MESSAGE          = 0xE0; // send data for an analog pin (or PWM)
+    static const quint8 COMMAND_REPORT_ANALOG           = 0xC0; // enable analog input by pin #
+    static const quint8 COMMAND_REPORT_DIGITAL          = 0xD0; // enable digital input by port
+    static const quint8 COMMAND_SERVO_CONFIG            = 0x70; // set the parameters for a servo pin (max and min pulse, max and min angle)
 
-    static const int COMMAND_START_SYSEX             = 0xF0; // start a MIDI SysEx message
-    static const int COMMAND_END_SYSEX               = 0xF7; // end a MIDI SysEx message
+    static const quint8 COMMAND_START_SYSEX             = 0xF0; // start a MIDI SysEx message
+    static const quint8 COMMAND_END_SYSEX               = 0xF7; // end a MIDI SysEx message
 
-    static const int COMMAND_I2C_REQUEST             = 0x76;
-    static const int COMMAND_I2C_REPLY               = 0x77;
-    static const int COMMAND_I2C_CONFIG              = 0x78;
-    static const int COMMAND_I2C_SAMPLING_INTERVAL   = 0x7A;
+    static const quint8 COMMAND_I2C_REQUEST             = 0x76;
+    static const quint8 COMMAND_I2C_REPLY               = 0x77;
+    static const quint8 COMMAND_I2C_CONFIG              = 0x78;
+    static const quint8 COMMAND_I2C_SAMPLING_INTERVAL   = 0x7A;
 
-    static const int COMMAND_PIN_MODE_QUERY          = 0x72; // ask for current and supported pin modes
-    static const int COMMAND_PIN_MODE_RESPONSE       = 0x73; // reply with current and supported pin modes
-    static const int COMMAND_PIN_STATE_QUERY         = 0x6D;
-    static const int COMMAND_PIN_STATE_RESPONSE      = 0x6E;
-    static const int COMMAND_CAPABILITY_QUERY        = 0x6B;
-    static const int COMMAND_CAPABILITY_RESPONSE     = 0x6C;
-    static const int COMMAND_ANALOG_MAPPING_QUERY    = 0x69;
-    static const int COMMAND_ANALOG_MAPPING_RESPONSE = 0x6A;
-    static const int COMMAND_REPORT_FIRMWARE         = 0x79;
+    static const quint8 COMMAND_PIN_MODE_QUERY          = 0x72; // ask for current and supported pin modes
+    static const quint8 COMMAND_PIN_MODE_RESPONSE       = 0x73; // reply with current and supported pin modes
+    static const quint8 COMMAND_PIN_STATE_QUERY         = 0x6D;
+    static const quint8 COMMAND_PIN_STATE_RESPONSE      = 0x6E;
+    static const quint8 COMMAND_CAPABILITY_QUERY        = 0x6B;
+    static const quint8 COMMAND_CAPABILITY_RESPONSE     = 0x6C;
+    static const quint8 COMMAND_ANALOG_MAPPING_QUERY    = 0x69;
+    static const quint8 COMMAND_ANALOG_MAPPING_RESPONSE = 0x6A;
+    static const quint8 COMMAND_REPORT_FIRMWARE         = 0x79;
 
 
 public slots:
@@ -127,7 +127,7 @@ private:
     quint8*      _bufferToParse;
     int          _parserCommandLenght;
     int          _parserReceivedCount;
-    bool         _receiving;           // TODO: check this variable ans its usage
+    bool         _receiving;           // TODO: check this variable and its usage
 
 };
 } // namespace
