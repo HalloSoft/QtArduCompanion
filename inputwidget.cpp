@@ -17,3 +17,13 @@ void InputWidget::setEnabled(bool eneable)
 {
     // TODO:
 }
+
+void InputWidget::setDigitalInput(bool on)
+{
+    // TODO:
+}
+
+void InputWidget::setAnalogInput(quint8 value)
+{
+    // TODO:
+}
