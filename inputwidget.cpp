@@ -17,3 +17,11 @@ void InputWidget::setEnabled(bool eneable)
 {
     // TODO:
 }
+
+void InputWidget::setDigitalValue(bool on)
+{
+    if(on)
+        ui->labeLed->setPixmap(QPixmap(":/Icons/ledgreen.png"));
+    else
+        ui->labeLed->setPixmap(QPixmap(":/Icons/ledgray.png"));
+}

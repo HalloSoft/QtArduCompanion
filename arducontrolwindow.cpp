@@ -29,6 +29,10 @@ void ArduControlWindow::initialize()
 {
     setWindowTitle(tr("Arduino control"));
 
+    // Layout
+    ui->splitter->setStretchFactor(0, 2);
+    ui->treeWidget->setMinimumWidth(500);
+
     initializeDvice();
     initializeTreeHeaders();
     initializeTreeWidgetRows();

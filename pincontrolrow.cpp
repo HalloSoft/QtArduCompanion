@@ -13,9 +13,13 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
     _modeComboBox = new QComboBox(parent);
     _modeComboBox->addItem(tr("In"));
     _modeComboBox->addItem(tr("Out"));
+    _modeComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);   // TODO: Maybe not neccessary
 
     _outputWidget = new OutputWidget(parent);
+    _outputWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);   // TODO: Maybe not neccessary
+
     _inputWidget = new InputWidget(parent);
+    _inputWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);   // TODO: Maybe not neccessary
 
     if(parent)
     {
@@ -26,6 +30,7 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
 
     bool isConnected = false;                                                                      Q_UNUSED(isConnected);
     isConnected = connect(_modeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode())); Q_ASSERT(isConnected);
+
 
 }
 

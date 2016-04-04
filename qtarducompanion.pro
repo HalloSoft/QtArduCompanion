@@ -21,7 +21,8 @@ SOURCES += \
     arducontrolwindow.cpp \
     pincontrolrow.cpp \
     inputwidget.cpp \
-    outputwidget.cpp
+    outputwidget.cpp \
+    connectionwidget.cpp
 
 HEADERS +=\
     fdevice.h \
@@ -32,13 +33,15 @@ HEADERS +=\
     arducontrolwindow.h \
     pincontrolrow.h \
     inputwidget.h \
-    outputwidget.h
+    outputwidget.h \
+    connectionwidget.h
 
 FORMS += \
     mainwidget.ui \
     arducontrolwindow.ui \
     inputwidget.ui \
-    outputwidget.ui
+    outputwidget.ui \
+    connectionwidget.ui
 
 RESOURCES += \
     icons.qrc

@@ -16,6 +16,7 @@ public:
     ~InputWidget();
 
     void setEnabled(bool eneable);
+    void setDigitalValue(bool on);
 
 private:
     Ui::InputWidget *ui;

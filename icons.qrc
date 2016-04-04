@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>Icons/ledgray.png</file>
+        <file>Icons/ledgreen.png</file>
     </qresource>
 </RCC>
