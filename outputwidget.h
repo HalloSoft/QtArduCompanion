@@ -17,6 +17,10 @@ public:
 
     void setEnabled(bool enable);
 
+signals:
+    void digitalValueChanged(bool on);
+
+
 private:
     Ui::OutputWidget *ui;
 };

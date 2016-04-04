@@ -18,6 +18,10 @@ public:
     void setEnabled(bool eneable);
     void setDigitalValue(bool on);
 
+public slots:
+    void setDigitalInput(bool on);
+    void setAnalogInput(quint8 value);
+
 private:
     Ui::InputWidget *ui;
 };
