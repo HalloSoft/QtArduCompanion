@@ -15,6 +15,12 @@ public:
     explicit ConnectionWidget(QWidget *parent = 0);
     ~ConnectionWidget();
 
+signals:
+    void connectButtonPressed();
+
+private slots:
+
+
 private:
     Ui::ConnectionWidget *ui;
 };

@@ -19,15 +19,20 @@ public:
 private slots:
     void setReady();
 
+    void connectDisconnect();
+
+    void displayValue(int pin, int value);
+    void displayMessage(const QString &category, const QString& message);
+
 
 private:
     void initialize();
 
-    void initializeDvice();
+    void initializeDevice();
     void initializeTreeHeaders();
     void initializeTreeWidgetRows();
 
-    qfirmata::FDevice *arduino;
+    qfirmata::FDevice *_arduino {0};
     Ui::ArduControlWindow *ui;
 };
 

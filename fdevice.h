@@ -116,9 +116,9 @@ private:
     int         _minorVersion;
 
     // Inputs / outputs status
-    int _analogInputData[ANALOGINPUTDATALENGTH];
+    int  _analogInputData[ANALOGINPUTDATALENGTH];
     bool _digitalInputData[DIGITALINPUTDATALENGTH];
-    int _digitalOutputData[DIGITALOUTPUTDATALENGTH];
+    int  _digitalOutputData[DIGITALOUTPUTDATALENGTH];
 
 
     // Serial connection vars

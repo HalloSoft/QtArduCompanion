@@ -12,18 +12,27 @@ class InputWidget : public QWidget
     Q_OBJECT
 
 public:
+
+    enum eMode { mDigital, mAnalog};
+
     explicit InputWidget(QWidget *parent = 0);
     ~InputWidget();
 
-    void setEnabled(bool eneable);
+    void setEnabled(bool enable);
+    void setMode(eMode mode);
     void setDigitalValue(bool on);
 
 public slots:
-    void setDigitalInput(bool on);
-    void setAnalogInput(quint8 value);
+    void setDigitalDisplayStatus(bool on);
+    void setAnalogDisplayStatus(quint8 value);
 
 private:
     Ui::InputWidget *ui;
+
+    eMode _currentMode {mAnalog};
+    bool  _enabled {false};
+
+
 };
 
 #endif // INPUTWIDGET_H

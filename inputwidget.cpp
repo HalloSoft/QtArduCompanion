@@ -13,15 +13,34 @@ InputWidget::~InputWidget()
     delete ui;
 }
 
-void InputWidget::setEnabled(bool eneable)
+void InputWidget::setEnabled(bool enable)
 {
-    // TODO:
+    _enabled = enable;
+    ui->analogIndicator->setEnabled(_enabled);
 }
 
-void InputWidget::setDigitalValue(bool on)
+void InputWidget::setMode(eMode mode)
 {
+     _currentMode = mode;
+     if(_currentMode == mDigital)
+         ui->stackedWidget->setCurrentIndex(0);
+     else
+         ui->stackedWidget->setCurrentIndex(1);
+}
+
+void InputWidget::setDigitalDisplayStatus(bool on)
+{
+    if(_currentMode == mAnalog)
+        return;
+
     if(on)
         ui->labeLed->setPixmap(QPixmap(":/Icons/ledgreen.png"));
     else
         ui->labeLed->setPixmap(QPixmap(":/Icons/ledgray.png"));
+}
+
+void InputWidget::setAnalogDisplayStatus(quint8 value)
+{
+    if(_currentMode == mAnalog)
+        ui->analogIndicator->setValue(value);
 }

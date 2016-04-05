@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>192</width>
-    <height>85</height>
+    <width>257</width>
+    <height>84</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,20 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="pageAnalog"/>
+     <widget class="QWidget" name="pageAnalog">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QProgressBar" name="analogIndicator">
+         <property name="value">
+          <number>24</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

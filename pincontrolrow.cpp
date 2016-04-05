@@ -46,6 +46,11 @@ void PinControlRow::setEnabled(bool enabled)
     _inputWidget->setEnabled(enabled);
 }
 
+void PinControlRow::setAdMode(eAdMode mode)
+{
+    _inputWidget->setMode(InputWidget::mAnalog);
+}
+
 void PinControlRow::setMode()
 {
     int index = _modeComboBox->currentIndex();
@@ -61,4 +66,16 @@ void PinControlRow::setMode()
     }
 
     emit changed();
+}
+
+void PinControlRow::setInputValue(quint32 value)
+{
+    Q_ASSERT_X(_outputWidget, "PinControlRow", "setOutputValue(quint32 value)");
+
+    if(value > 0)
+        _inputWidget->setDigitalDisplayStatus(true);
+    else
+        _inputWidget->setDigitalDisplayStatus(true);
+
+    _inputWidget->setAnalogDisplayStatus(value);
 }
