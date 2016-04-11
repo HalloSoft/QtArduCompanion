@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>Icons/ledgray.png</file>
         <file>Icons/ledgreen.png</file>
+        <file>Icons/fdevice.png</file>
     </qresource>
 </RCC>

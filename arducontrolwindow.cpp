@@ -31,10 +31,12 @@ void ArduControlWindow::setReady()
 
 void ArduControlWindow::connectDisconnect()
 {
+    const QString portName = ui->cnnectionIndicator->currentPortName();
+
     if(_arduino && _arduino->available())
         _arduino->disconnect();
     else
-       _arduino->connectDevice();
+       _arduino->connectDevice(portName);
 }
 
 void ArduControlWindow::displayValue(int pin, int value)
@@ -51,12 +53,12 @@ void ArduControlWindow::displayValue(int pin, int value)
 void ArduControlWindow::displayMessage(const QString& category, const QString &message)
 {
     QString output = QString("%1:\t%2\n").arg(category).arg(message);
-    ui->console->appendPlainText(output);
+    ui->console->appendHtml(QString("<b>%1</b>").arg(output));
 }
 
 void ArduControlWindow::initialize()
 {
-    setWindowTitle(tr("Arduino control"));
+    setWindowTitle(tr("Arduino Control"));
 
     // Layout
     ui->splitter->setStretchFactor(0, 2);
@@ -65,6 +67,13 @@ void ArduControlWindow::initialize()
     initializeDevice();
     initializeTreeHeaders();
     initializeTreeWidgetRows();
+
+    // Console
+    QPalette palette = ui->console->palette();
+    palette.setColor(QPalette::Base, Qt::black);
+    QColor textColor(100, 255, 150);
+    palette.setColor(QPalette::Text, textColor);
+    ui->console->setPalette(palette);
 }
 
 void ArduControlWindow::initializeDevice()

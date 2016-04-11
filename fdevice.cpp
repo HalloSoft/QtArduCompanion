@@ -34,8 +34,11 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     Q_CHECK_PTR(_serialPort);
 }
 
-bool FDevice::connectDevice()
+bool FDevice::connectDevice(QString portName)
 {
+    if(!portName.isEmpty())
+        _serialPort->setPortName(portName);
+
     _connected = _serialPort->open(QIODevice::ReadWrite);
 
     if (_connected)

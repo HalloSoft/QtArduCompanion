@@ -15,6 +15,8 @@ public:
     explicit ConnectionWidget(QWidget *parent = 0);
     ~ConnectionWidget();
 
+    QString currentPortName() const;
+
 signals:
     void connectButtonPressed();
 
@@ -22,6 +24,8 @@ private slots:
 
 
 private:
+    void initialize();
+
     Ui::ConnectionWidget *ui;
 };
 

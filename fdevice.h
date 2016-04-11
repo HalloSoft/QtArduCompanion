@@ -23,7 +23,7 @@ class FDevice : public QObject
 
 public:
     FDevice(QString serialPortName = QString(), int _baud_rate = 57600);
-    bool connectDevice(); // TODO: maybe const
+    bool connectDevice(QString portName = QString()); // TODO: maybe const
     void disconnectDevice();
     bool available();
 
