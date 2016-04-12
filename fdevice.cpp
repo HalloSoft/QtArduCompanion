@@ -30,8 +30,9 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     bool isConnected = false;                                                               Q_UNUSED(isConnected);
     isConnected = connect(_serialPort, SIGNAL(readyRead()),   this, SLOT(processSerial())); Q_ASSERT(isConnected);
     isConnected = connect(this,        SIGNAL(deviceReady()), this, SLOT(initialize()));    Q_ASSERT(isConnected);
+    isConnected = connect(_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SIGNAL(error(QSerialPort::SerialPortError)));
+    Q_ASSERT(isConnected);
 
-    Q_CHECK_PTR(_serialPort);
 }
 
 bool FDevice::connectDevice(QString portName)

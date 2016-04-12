@@ -1,5 +1,6 @@
 #ifndef ARDUCONTROLWINDOW_H
 #define ARDUCONTROLWINDOW_H
+
 #include "fdevice.h"
 
 #include <QMainWindow>
@@ -19,11 +20,9 @@ public:
 private slots:
     void setReady();
 
-    void connectDisconnect();
-
     void displayValue(int pin, int value);
     void displayMessage(const QString &category, const QString& message);
-
+    void displayPortError(QSerialPort::SerialPortError error);
 
 private:
     void initialize();

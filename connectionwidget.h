@@ -3,6 +3,10 @@
 
 #include <QWidget>
 
+#include "fdevice.h"
+
+using namespace qfirmata;
+
 namespace Ui {
 class ConnectionWidget;
 }
@@ -17,15 +21,19 @@ public:
 
     QString currentPortName() const;
 
+     void setDevice(FDevice *device);
+
 signals:
     void connectButtonPressed();
 
 private slots:
+    void connectDisconnect();
 
 
 private:
     void initialize();
 
+    FDevice    *_arduino {0};
     Ui::ConnectionWidget *ui;
 };
 

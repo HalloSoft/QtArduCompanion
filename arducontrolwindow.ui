@@ -20,7 +20,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="ConnectionWidget" name="cnnectionIndicator" native="true"/>
+     <widget class="ConnectionWidget" name="connectionControl" native="true"/>
     </item>
     <item>
      <widget class="QSplitter" name="splitter">

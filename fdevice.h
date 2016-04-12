@@ -100,6 +100,7 @@ signals:
 
     void deviceReady();
     void messageFired(const QString& category, const QString& message);
+    void error(QSerialPort::SerialPortError error);
 
 private slots:
     void initialize();

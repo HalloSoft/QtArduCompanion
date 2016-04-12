@@ -14,9 +14,6 @@ ArduControlWindow::ArduControlWindow(QWidget *parent) :
     ui->setupUi(this);
     initialize();
 
-    bool isConnected = false; Q_UNUSED(isConnected);
-    isConnected = connect(ui->cnnectionIndicator, SIGNAL(connectButtonPressed()), this, SLOT(connectDisconnect()));
-    Q_ASSERT_X(isConnected, "ArduControlWindow", "Constructor");
 }
 
 ArduControlWindow::~ArduControlWindow()
@@ -27,16 +24,6 @@ ArduControlWindow::~ArduControlWindow()
 void ArduControlWindow::setReady()
 {
      qDebug() << "Initializing ports...";
-}
-
-void ArduControlWindow::connectDisconnect()
-{
-    const QString portName = ui->cnnectionIndicator->currentPortName();
-
-    if(_arduino && _arduino->available())
-        _arduino->disconnect();
-    else
-       _arduino->connectDevice(portName);
 }
 
 void ArduControlWindow::displayValue(int pin, int value)
@@ -54,6 +41,11 @@ void ArduControlWindow::displayMessage(const QString& category, const QString &m
 {
     QString output = QString("%1:\t%2\n").arg(category).arg(message);
     ui->console->appendHtml(QString("<b>%1</b>").arg(output));
+}
+
+void ArduControlWindow::displayPortError(QSerialPort::SerialPortError error)
+{
+    qDebug() << "Error:" << _arduino->deviceName() << "No" << error;
 }
 
 void ArduControlWindow::initialize()
@@ -74,6 +66,8 @@ void ArduControlWindow::initialize()
     QColor textColor(100, 255, 150);
     palette.setColor(QPalette::Text, textColor);
     ui->console->setPalette(palette);
+
+    ui->connectionControl->setDevice(_arduino);
 }
 
 void ArduControlWindow::initializeDevice()
@@ -87,6 +81,9 @@ void ArduControlWindow::initializeDevice()
     Q_ASSERT_X(isConnected, "ArduControlWindow", "initializeDevice()");
 
     isConnected = connect(_arduino, SIGNAL(messageFired(QString,QString)), this, SLOT(displayMessage(QString,QString)));
+    Q_ASSERT_X(isConnected, "ArduControlWindow", "initializeDevice()");
+
+    isConnected = connect(_arduino, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(displayPortError(QSerialPort::SerialPortError)));
     Q_ASSERT_X(isConnected, "ArduControlWindow", "initializeDevice()");
 
     _arduino->setDeviceName("ArduinoUno");
