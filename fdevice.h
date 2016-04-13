@@ -22,10 +22,17 @@ class FDevice : public QObject
     Q_OBJECT
 
 public:
+    enum ConnectionStatus
+    {
+        Disconnected, Connected, Ready
+    };
+
     FDevice(QString serialPortName = QString(), int _baud_rate = 57600);
     bool connectDevice(QString portName = QString()); // TODO: maybe const
     void disconnectDevice();
-    bool available();
+
+    bool             available();
+    ConnectionStatus connectionStaus() const;
 
     void reportFirmware();
     void requestCapabilities();
@@ -43,6 +50,7 @@ public:
 
     QString deviceName() const {return _deviceName;}
     void setDeviceName(const QString deviceName) {_deviceName = deviceName;}
+
 
     // Firmata protocol constants
     static const int MAX_DATA_BYTES                  = 32;
@@ -98,7 +106,8 @@ public slots:
 
 signals:
 
-    void deviceReady();
+    void deviceReady(); // TODO: check if neccessary
+    void connectionStatusChanged();
     void messageFired(const QString& category, const QString& message);
     void error(QSerialPort::SerialPortError error);
 
@@ -112,7 +121,7 @@ private:
     // Firmata protocol vars
     QString     _firmataName;
     QString     _deviceName;
-    bool        _ready;
+    bool        _ready {false};
     int         _majorVersion;
     int         _minorVersion;
 
@@ -124,7 +133,7 @@ private:
 
     // Serial connection vars
     QSerialPort* _serialPort;
-    bool         _connected;
+    bool         _connected {false};
     int          _baud_rate;
     quint8*      _bufferToParse;
     int          _parserCommandLenght;

@@ -24,14 +24,16 @@ public:
      void setDevice(FDevice *device);
 
 signals:
-    void connectButtonPressed();
+    void connectButtonPressed(); // TODO: Maybe eliminate
+    void connectionStatusChanged();
 
 private slots:
     void connectDisconnect();
+    void displayConnectionStatus();
 
 
 private:
-    void initialize();
+    void initializeWidget();
 
     FDevice    *_arduino {0};
     Ui::ConnectionWidget *ui;

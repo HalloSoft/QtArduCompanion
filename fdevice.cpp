@@ -13,7 +13,6 @@ FDevice::FDevice(QString serialPortName, int baudrate)
     _deviceName = "QfDevice";
 
     _bufferToParse = (quint8*) malloc(4096);
-    _connected = false;
 
     if (serialPortName.isEmpty())
     {
@@ -47,6 +46,8 @@ bool FDevice::connectDevice(QString portName)
     else
         emit messageFired(_deviceName, "Device not connected!");
 
+    emit connectionStatusChanged();
+
     return _connected;
 }
 
@@ -55,6 +56,8 @@ void FDevice::disconnectDevice()
     _serialPort->close();
     _connected = false;
     _ready = false;
+
+    emit connectionStatusChanged();
 }
 
 void FDevice::initialize()
@@ -152,6 +155,19 @@ void FDevice::pinMode(int pin, int mode)
 bool FDevice::available()
 {
     return _connected && _ready;
+}
+
+FDevice::ConnectionStatus FDevice::connectionStaus() const
+{
+    ConnectionStatus status = Disconnected;
+
+    if(_connected)
+        status = Connected;
+
+    if(_connected && _ready)
+        status = Ready;
+
+    return status;
 }
 
 bool FDevice::digitalRead(int pin)
@@ -405,6 +421,7 @@ void FDevice::parseBuffer()
 
             _ready = true;
             emit deviceReady();
+            emit connectionStatusChanged();
         }
         else if (_bufferToParse[1] == COMMAND_CAPABILITY_RESPONSE)
         {

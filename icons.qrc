@@ -3,5 +3,6 @@
         <file>Icons/ledgray.png</file>
         <file>Icons/ledgreen.png</file>
         <file>Icons/fdevice.png</file>
+        <file>Icons/ledyellow.png</file>
     </qresource>
 </RCC>
