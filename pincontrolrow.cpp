@@ -9,6 +9,7 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
     QTreeWidgetItem(parent)
 {
     setText(0, QString("Pin %1").arg(pinNumber));
+    _pinNumber = pinNumber;
 
     _modeComboBox = new QComboBox(parent);
     _modeComboBox->addItem(tr("In"));
@@ -41,6 +42,7 @@ PinControlRow::~PinControlRow()
 
 void PinControlRow::setEnabled(bool enabled)
 {
+    _isEnabled = enabled;
     _modeComboBox->setEnabled(enabled);
     _outputWidget->setEnabled(enabled);
     _inputWidget->setEnabled(enabled);
@@ -48,7 +50,21 @@ void PinControlRow::setEnabled(bool enabled)
 
 void PinControlRow::setAdMode(eAdMode mode)
 {
-    _inputWidget->setMode(InputWidget::mAnalog);
+    if(mode == mAnalog)
+        _inputWidget->setMode(InputWidget::mAnalog);
+
+    if(mode == mDigital)
+        _inputWidget->setMode(InputWidget::mDigital);
+}
+
+void PinControlRow::setIoMode(eIoMode mode)
+{
+    _mode = mode;
+
+    if(mode == mInput)
+        _modeComboBox->setCurrentIndex(0);
+    if(mode == mOutput)
+        _modeComboBox->setCurrentIndex(1);
 }
 
 void PinControlRow::setMode()

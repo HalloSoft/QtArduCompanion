@@ -12,16 +12,20 @@ class PinControlRow : public QObject, public QTreeWidgetItem
     Q_OBJECT
 
 public:
-    enum eMode { mInput, mOutput};
+    enum eIoMode { mInput, mOutput};
     enum eAdMode { mDigital, mAnalog};
 
     PinControlRow(QTreeWidget *parent, quint16 pinNumber);
     ~PinControlRow();
 
     quint16 pinNumber() const {return _pinNumber;}
+    bool isEnabled() const {return _isEnabled;}
+    eAdMode isAnalogMode() const { return _adMode;}
+    eIoMode ioMode() const { return _mode;}
 
     void setEnabled(bool enabled);
     void setAdMode(eAdMode mode);
+    void setIoMode(eIoMode mode);
     void setInputValue(quint32 value);
 
 public slots:
@@ -37,8 +41,9 @@ private:
     QComboBox    *_modeComboBox {0};
     OutputWidget *_outputWidget {0};
     InputWidget  *_inputWidget {0};
-    eMode         _mode {mInput};
+    eIoMode       _mode {mInput};
     eAdMode       _adMode {mDigital};
+    bool          _isEnabled {false};
 };
 
 #endif // PINCONTROLROW_H

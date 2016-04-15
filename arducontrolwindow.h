@@ -5,6 +5,8 @@
 
 #include <QMainWindow>
 
+class PinControlRow;
+
 namespace Ui {
 class ArduControlWindow;
 }
@@ -24,12 +26,16 @@ private slots:
     void displayMessage(const QString &category, const QString& message);
     void displayPortError(QSerialPort::SerialPortError error);
 
+
 private:
     void initialize();
 
     void initializeDevice();
+    void initializeControls();
     void initializeTreeHeaders();
     void initializeTreeWidgetRows();
+
+    void connectControlRow(PinControlRow* row) const;
 
     qfirmata::FDevice *_arduino {0};
     Ui::ArduControlWindow *ui;

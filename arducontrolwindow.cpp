@@ -59,6 +59,7 @@ void ArduControlWindow::initialize()
     initializeDevice();
     initializeTreeHeaders();
     initializeTreeWidgetRows();
+    initializeControls();
 
     // Console
     QPalette palette = ui->console->palette();
@@ -89,6 +90,20 @@ void ArduControlWindow::initializeDevice()
     _arduino->setDeviceName("ArduinoUno");
 }
 
+void ArduControlWindow::initializeControls()
+{
+    // set all connections
+
+
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+    {
+        PinControlRow *controlRow = dynamic_cast<PinControlRow*>(ui->treeWidget->topLevelItem(i));
+        connectControlRow(controlRow);
+
+    }
+
+}
+
 void ArduControlWindow::initializeTreeHeaders()
 {
     QStringList headers;
@@ -107,6 +122,7 @@ void ArduControlWindow::initializeTreeWidgetRows()
     row2->setEnabled(false);
     PinControlRow *row3 = new PinControlRow(ui->treeWidget, 13);
     row3->setEnabled( true);
+    row3->setIoMode(PinControlRow::mOutput);
     PinControlRow *row4 = new PinControlRow(ui->treeWidget, 14);
     row4->setEnabled(false);
 
@@ -116,4 +132,15 @@ void ArduControlWindow::initializeTreeWidgetRows()
 //        row->setEnabled( false);
 //        row->setAdMode(PinControlRow::mAnalog);
 //    }
+}
+
+void ArduControlWindow::connectControlRow(PinControlRow *row) const
+{
+    bool isConnected = false; Q_UNUSED(isConnected);
+
+    if(row && row->isEnabled())
+    {
+        if(row->ioMode() == PinControlRow::mOutput)
+        ;//isConnected = connect(controlRow, ) // do something
+    }
 }
