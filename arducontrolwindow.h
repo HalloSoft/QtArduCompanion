@@ -26,6 +26,8 @@ private slots:
     void displayMessage(const QString &category, const QString& message);
     void displayPortError(QSerialPort::SerialPortError error);
 
+    void setDigitalOutput(int pinNumber, bool value);
+    void processDigitalInputChange();
 
 private:
     void initialize();

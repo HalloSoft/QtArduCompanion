@@ -26,15 +26,18 @@ public:
     void setEnabled(bool enabled);
     void setAdMode(eAdMode mode);
     void setIoMode(eIoMode mode);
-    void setInputValue(quint32 value);
+    void setAnalogInputValue(quint32 value);
+    void setDigitalInputValue(bool value);
 
 public slots:
 
 signals:
-    void changed();
+    void modeChanged(int pinNummer);
+    void buttonTriggered(int pinNummer, bool value);
 
 private slots:
     void setMode();
+    void processOutput(bool value);
 
 private:
     quint16       _pinNumber {0};

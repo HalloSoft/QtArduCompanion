@@ -18,12 +18,16 @@ ArduControlWindow::ArduControlWindow(QWidget *parent) :
 
 ArduControlWindow::~ArduControlWindow()
 {
+    _arduino->disconnect();
     delete ui;
 }
 
 void ArduControlWindow::setReady()
 {
      qDebug() << "Initializing ports...";
+     // set Modes
+     _arduino->pinMode(12, FDevice::PINMODE_INPUT);
+     _arduino->pinMode(13, FDevice::PINMODE_OUTPUT);
 }
 
 void ArduControlWindow::displayValue(int pin, int value)
@@ -33,7 +37,7 @@ void ArduControlWindow::displayValue(int pin, int value)
         PinControlRow *row = dynamic_cast<PinControlRow*>(ui->treeWidget->topLevelItem(i));
 
         if(row && (row->pinNumber() == pin))
-            row->setInputValue(value);
+            row->setAnalogInputValue(value);
     }
 }
 
@@ -46,6 +50,31 @@ void ArduControlWindow::displayMessage(const QString& category, const QString &m
 void ArduControlWindow::displayPortError(QSerialPort::SerialPortError error)
 {
     qDebug() << "Error:" << _arduino->deviceName() << "No" << error;
+}
+
+void ArduControlWindow::setDigitalOutput(int pinNumber, bool value)
+{
+     _arduino->digitalWrite(pinNumber, value);
+}
+
+void ArduControlWindow::processDigitalInputChange()
+{
+    //qDebug() << "Digital Input changed";
+    for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+    {
+        PinControlRow *row = dynamic_cast<PinControlRow*>(ui->treeWidget->topLevelItem(i));
+        Q_CHECK_PTR(row);
+
+        bool isDigitalInput = !row->isAnalogMode() && (row->ioMode() == PinControlRow::mInput);
+        if(isDigitalInput)
+        {
+            quint16 pin = row->pinNumber();
+            bool result = _arduino->digitalRead(row->pinNumber());
+            row->setDigitalInputValue(result);
+            if(pin == 12)
+                qDebug() << "Digital Input changed - Pin:" << pin << "Value:" << result;
+        }
+    }
 }
 
 void ArduControlWindow::initialize()
@@ -74,6 +103,7 @@ void ArduControlWindow::initialize()
 void ArduControlWindow::initializeDevice()
 {
     _arduino = new FDevice();
+    _arduino->setDeviceName("ArduinoUno");
     Q_CHECK_PTR(_arduino);
 
     bool isConnected = false; Q_UNUSED(isConnected);
@@ -87,7 +117,9 @@ void ArduControlWindow::initializeDevice()
     isConnected = connect(_arduino, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(displayPortError(QSerialPort::SerialPortError)));
     Q_ASSERT_X(isConnected, "ArduControlWindow", "initializeDevice()");
 
-    _arduino->setDeviceName("ArduinoUno");
+    isConnected = connect(_arduino, SIGNAL(digitalInputChanged()), this, SLOT(processDigitalInputChange()));
+    Q_ASSERT_X(isConnected, "ArduControlWindow", "initializeDevice()");
+
 }
 
 void ArduControlWindow::initializeControls()
@@ -99,7 +131,6 @@ void ArduControlWindow::initializeControls()
     {
         PinControlRow *controlRow = dynamic_cast<PinControlRow*>(ui->treeWidget->topLevelItem(i));
         connectControlRow(controlRow);
-
     }
 
 }
@@ -118,11 +149,15 @@ void ArduControlWindow::initializeTreeWidgetRows()
     ui->treeWidget->setColumnCount(4);
     PinControlRow *row1 = new PinControlRow(ui->treeWidget, 11);
     row1->setEnabled( false);
+
     PinControlRow *row2 = new PinControlRow(ui->treeWidget, 12);
-    row2->setEnabled(false);
+    row2->setEnabled(true);
+    row2->setAdMode(PinControlRow::mDigital);
     PinControlRow *row3 = new PinControlRow(ui->treeWidget, 13);
     row3->setEnabled( true);
     row3->setIoMode(PinControlRow::mOutput);
+    row3->setAdMode(PinControlRow::mDigital);
+
     PinControlRow *row4 = new PinControlRow(ui->treeWidget, 14);
     row4->setEnabled(false);
 
@@ -141,6 +176,9 @@ void ArduControlWindow::connectControlRow(PinControlRow *row) const
     if(row && row->isEnabled())
     {
         if(row->ioMode() == PinControlRow::mOutput)
-        ;//isConnected = connect(controlRow, ) // do something
+        {
+            isConnected = connect(row, SIGNAL(buttonTriggered(int,bool)), this, SLOT(setDigitalOutput(int,bool)));
+            Q_ASSERT_X(isConnected, "ArduControlWindow", "connectControlRow()");
+        }
     }
 }

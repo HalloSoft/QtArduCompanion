@@ -5,7 +5,6 @@
 
 #include "util.h"
 
-
 using namespace qfirmata;
 
 FDevice::FDevice(QString serialPortName, int baudrate)
@@ -373,27 +372,28 @@ void FDevice::parseBuffer()
 
     if (cmd == COMMAND_ANALOG_MESSAGE && _parserReceivedCount == 3)
     {
-            int analog_ch = (_bufferToParse[0] & 0x0F);
-            int analog_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
+        int analog_ch = (_bufferToParse[0] & 0x0F);
+        int analog_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
 
-            Q_ASSERT_X(analog_ch < ANALOGINPUTDATALENGTH, "parseBuffer", "BuffereOverflow (_analogInputData)");
+        Q_ASSERT_X(analog_ch < ANALOGINPUTDATALENGTH, "parseBuffer", "BuffereOverflow (_analogInputData)");
 
-            _analogInputData[analog_ch] = analog_val;
+        _analogInputData[analog_ch] = analog_val;
 
     }
     else if (cmd == COMMAND_DIGITAL_MESSAGE && _parserReceivedCount == 3)
     {
-            int port_num = (_bufferToParse[0] & 0x0F);
-            int port_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
-            int pin = port_num * 8;
+        int port_num = (_bufferToParse[0] & 0x0F);
+        int port_val = _bufferToParse[1] | (_bufferToParse[2] << 7);
+        int pin = port_num * 8;
 
-            for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
-            {
-                bool val = (port_val & mask) ? true : false;
-                if(pin < DIGITALINPUTDATALENGTH)
-                    _digitalInputData[pin] = val;
-            }
+        for (int mask=1; mask & 0xFF; mask <<= 1, pin++)
+        {
+            bool val = (port_val & mask) ? true : false;
+            if(pin < DIGITALINPUTDATALENGTH)
+                _digitalInputData[pin] = val;
+        }
 
+        emit digitalInputChanged();
     }
     else if (_bufferToParse[0] == COMMAND_START_SYSEX && _bufferToParse[_parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
@@ -407,7 +407,7 @@ void FDevice::parseBuffer()
 
             for (int i = 4; i < _parserReceivedCount - 2; i += 2)
             {
-                    name[len++] = (_bufferToParse[i] & 0x7F) | ((_bufferToParse[i+1] & 0x7F) << 7);
+                name[len++] = (_bufferToParse[i] & 0x7F) | ((_bufferToParse[i+1] & 0x7F) << 7);
             }
 
             name[len++] = '-';
@@ -425,7 +425,7 @@ void FDevice::parseBuffer()
         }
         else if (_bufferToParse[1] == COMMAND_CAPABILITY_RESPONSE)
         {
-                /*
+            /*
                 int pin, i, n;
                 for (pin=0; pin < 128; pin++)
                 {
@@ -467,20 +467,20 @@ void FDevice::parseBuffer()
         else if (_bufferToParse[1] == COMMAND_ANALOG_MAPPING_RESPONSE)
         {
             qDebug() << "COMMAND_ANALOG_MAPPING_RESPONSE";
-                /*
-                int pin=0;
-                for (int i=2; i<parse_count-1; i++)
-                {
-                        pin_info[pin].analog_channel = parse_buf[i];
-                        pin++;
-                }
-                return;
-                */
+            /*
+            int pin=0;
+            for (int i=2; i<parse_count-1; i++)
+            {
+                    pin_info[pin].analog_channel = parse_buf[i];
+                    pin++;
+            }
+            return;
+            */
         }
         else if (_bufferToParse[1] == COMMAND_PIN_STATE_RESPONSE && _parserReceivedCount >= 6)
         {
             qDebug() << "COMMAND_PIN_STATE_RESPONSE";
-                /*
+            /*
                 int pin = parse_buf[2];
                 pin_info[pin].mode = parse_buf[3];
                 pin_info[pin].value = parse_buf[4];

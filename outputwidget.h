@@ -20,9 +20,15 @@ public:
 signals:
     void digitalValueChanged(bool on);
 
+private slots:
+    void processOnButton();
+    void processOffButton();
+    void processToggleButton();
+
 
 private:
     Ui::OutputWidget *ui;
+    bool _isDigitalOn {false};
 };
 
 #endif // OUTPUTWIDGET_H

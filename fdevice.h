@@ -106,7 +106,8 @@ public slots:
 
 signals:
 
-    void deviceReady(); // TODO: check if neccessary
+    void deviceReady();
+    void digitalInputChanged();
     void connectionStatusChanged();
     void messageFired(const QString& category, const QString& message);
     void error(QSerialPort::SerialPortError error);

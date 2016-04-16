@@ -4,10 +4,13 @@
 #include "outputwidget.h"
 
 #include <QComboBox>
+#include <QDebug>
 
 PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
     QTreeWidgetItem(parent)
 {
+
+
     setText(0, QString("Pin %1").arg(pinNumber));
     _pinNumber = pinNumber;
 
@@ -19,6 +22,7 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
     _outputWidget = new OutputWidget(parent);
     _outputWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);   // TODO: Maybe not neccessary
 
+
     _inputWidget = new InputWidget(parent);
     _inputWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);   // TODO: Maybe not neccessary
 
@@ -29,9 +33,11 @@ PinControlRow::PinControlRow(QTreeWidget *parent, quint16 pinNumber) :
         parent->setItemWidget(this, 3, _inputWidget);
     }
 
-    bool isConnected = false;                                                                      Q_UNUSED(isConnected);
-    isConnected = connect(_modeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode())); Q_ASSERT(isConnected);
-
+    bool isConnected = false; Q_UNUSED(isConnected);
+    isConnected = connect(_modeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode()));
+    Q_ASSERT_X(isConnected, "PinControlRow", "Constructor");
+    isConnected = connect(_outputWidget, SIGNAL(digitalValueChanged(bool)), this, SLOT(processOutput(bool)));
+    Q_ASSERT_X(isConnected, "PinControlRow", "Constructor");
 
 }
 
@@ -81,17 +87,30 @@ void PinControlRow::setMode()
         break;
     }
 
-    emit changed();
+    emit modeChanged(_pinNumber);
 }
 
-void PinControlRow::setInputValue(quint32 value)
+void PinControlRow::setAnalogInputValue(quint32 value)
 {
     Q_ASSERT_X(_outputWidget, "PinControlRow", "setOutputValue(quint32 value)");
 
-    if(value > 0)
-        _inputWidget->setDigitalDisplayStatus(true);
-    else
-        _inputWidget->setDigitalDisplayStatus(true);
 
     _inputWidget->setAnalogDisplayStatus(value);
+}
+
+void PinControlRow::setDigitalInputValue(bool value)
+{
+    Q_ASSERT_X(_outputWidget, "PinControlRow", "setOutputValue(quint32 value)");
+
+    qDebug() << "Digital Input:" << value;
+
+    if(value)
+        _inputWidget->setDigitalDisplayStatus(true);
+    else
+        _inputWidget->setDigitalDisplayStatus(false);
+}
+
+void PinControlRow::processOutput(bool value)
+{
+    emit buttonTriggered(_pinNumber, value);
 }
